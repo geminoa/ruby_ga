@@ -6,7 +6,7 @@ class Individual
 
 	attr_reader :age
 
-	# arg "gen" can be an Array or a Fixnum.
+	# arg "gen" can be Array or Fixnum.
 	def initialize(gen=nil)
 		@age = 0
 		@gene = []
@@ -41,7 +41,7 @@ class Individual
 		end
 	end
 
-	# Change the var $defaultGeneVariation.
+	# Change $defaultGeneVariation to the var.
 	def change_variation(var)
 		$defaultGeneVariation = var
 	end
@@ -260,7 +260,6 @@ class Individual
 	end
 
 	private
-
 	def mutation_move(gene_ary)
 		idx1 = rand(gene_ary.size)
 		idx2 = idx1 
