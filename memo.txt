@@ -1,4 +1,4 @@
-GAにおける計算の流れ by wiki
+GAにおける計算の流れ
 http://en.wikipedia.org/wiki/Genetic_algorithm
 1. Initialization
 2. Selection
