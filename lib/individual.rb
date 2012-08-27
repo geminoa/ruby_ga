@@ -1,6 +1,6 @@
 class Individual 
 
-	$defaultGeneSize = 10
+	$defaultGeneSize = 50
 	$defaultGeneVariation = 4
 	$debug = false 
 

@@ -66,8 +66,25 @@ class Population
     return nil
   end
 
-  def elite_selection()
-
+  def elite_selection(fun)
+    h = {}
+    @units.size.times do |i|
+      h[i] = @units[i].fitness(fun)
+    end
+    max_pos = h.sort_by{|k,v| v}.pop  # 評価関数が最大となるunitの位置
+    p max_pos[1]
+    return @units.slice!(max_pos[0])
   end
+
+  def rank_selection(fun)
+    h = {}
+    @units.size.times do |i|
+      h[i] = @units[i].fitness(fun)
+    end
+
+    # 評価関数の値に基づきランク付け
+    h.sort_by{|key,val| val}.each do |k,v|
+      # ここにランク付けの処理を書く
+    end
 
 end
