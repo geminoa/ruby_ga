@@ -55,6 +55,10 @@ class Individual
 		return @gene.dup
 	end
 
+  def fitness(fun)
+    return fun.call(@gene)
+  end
+
 	# Increment age.
 	def get_older
 		@age += 1
