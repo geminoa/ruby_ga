@@ -16,11 +16,9 @@ def main
 
 	#p po.units
 
-  p po.roulette_selection(method(:count_true))
+#  p po.roulette_selection(method(:count_true))
   p po.elite_selection(method(:count_true))
-
-
-	puts "done"
+  p po.rank_selection(method(:count_true))
 end
 
 main()

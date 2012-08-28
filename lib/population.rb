@@ -72,19 +72,41 @@ class Population
       h[i] = @units[i].fitness(fun)
     end
     max_pos = h.sort_by{|k,v| v}.pop  # 評価関数が最大となるunitの位置
-    p max_pos[1]
     return @units.slice!(max_pos[0])
   end
 
   def rank_selection(fun)
-    h = {}
-    @units.size.times do |i|
-      h[i] = @units[i].fitness(fun)
+    fitnesses = []
+    @units.each do |unit|
+      fitnesses << unit.fitness(fun)
     end
 
-    # 評価関数の値に基づきランク付け
-    h.sort_by{|key,val| val}.each do |k,v|
-      # ここにランク付けの処理を書く
+    # 適合度をランキングする
+    rank = [] # 適合度に低いものほど前に格納
+    fitnesses.uniq.sort.each do |fit|
+      rank << fit
     end
+
+    # 適合度の値を順位に変換
+    ranked_fitnesses = [] # 順位に変換された適合度を格納
+    fitnesses.each do |fit|
+      ranked_fitnesses << rank.index(fit)
+    end
+
+    # 基準値を決める
+    sum = 0
+    ranked_fitnesses.each{|rfit| sum += rfit}
+    border = rand(sum+1)
+
+    # 判定
+    tmp_sum = 0
+    @units.size.times do |i|
+      tmp_sum += ranked_fitnesses[i]
+      if tmp_sum >= border
+        return @units.slice!(i)
+      end
+    end
+    return nil
+  end
 
 end
