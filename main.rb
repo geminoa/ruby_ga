@@ -10,11 +10,16 @@ end
 
 def main
 	po = Population.new 5
-	2.times do
-		po.crossover_all
+	4.times do
+		po.crossover_all(true)
 	end
-
-	#p po.units
+	p po.units.size
+  ary = []
+  po.units.each do |unit|
+     ary << unit.age
+  end
+  p ary.uniq
+  p po.average_age
 
   units = []
   units << po.roulette_selection(method(:count_true))

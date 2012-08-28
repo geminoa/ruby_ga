@@ -7,7 +7,9 @@ class Population
     unit_num.times{|i| @units << Individual.new}
   end
 
-  def crossover_all
+  # すべてのunitが総当たり的に交差する
+  # If you would remain parents in the population, give double_up = true. 
+  def crossover_all(double_up=nil)
     tmp_units = @units.dup
     unit = tmp_units.shift
 
@@ -26,9 +28,15 @@ class Population
         old_units << unit
       end
     end
-    @units = old_units + new_units
+
+    if double_up == true 
+      @units = old_units + new_units
+    else
+      @units = new_units
+    end
   end
 
+  # Terminate units which age is over the 'limit_age'.
   def terminate_by_age(limit_age=5)
     tmp_units = []
     @units.each do |un|
@@ -44,6 +52,14 @@ class Population
     num.times do
       @units.slice!(rand(@units.size))
     end
+  end
+
+  def average_age
+    sum = 0.0
+    @units.each do |unit|
+      sum += unit.age
+    end
+    return sum / @units.size
   end
 
   #private
