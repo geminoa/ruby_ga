@@ -218,6 +218,21 @@ class Individual
     end
   end
 
+  # Each bit of first parent is checked with bit of second parent whether they are same.
+  # If same then the bit is taken for the offspring otherwise the bit from the third parent
+  # is taken for the offspring.
+  def three_parent_crossover(ary1, ary2, ary3)
+    tmp_ary = []
+    ary1.size.times do |i|
+      if ary1[i] == ary2[i]
+        tmp_ary[i] = ary2[i]
+      else
+        tmp_ary[i] = ary3[i]
+      end
+    end
+    return tmp_ary
+  end
+
   def mutation_inversion(gene_ary)
     idx1 = rand(gene_ary.size)
     idx2 = idx1 
