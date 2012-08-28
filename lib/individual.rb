@@ -1,35 +1,55 @@
 class Individual 
 
   $defaultGeneSize = 50
-  $defaultGeneVariation = 4
   $debug = false 
 
   attr_reader :age
 
-  # arg "gen" can be Array or Fixnum.
-  def initialize(gen=nil)
+  # You can design the gene structure as the argument 'gen'.
+  # Currently, the types of gene are
+  # 1. Array of boolean (You give the size of the array as 'gen_size', or the size
+  #    is $defaultGeneSize if the size is not given)
+  # 2. Array of Fixnum (You give the variation of gene as 'gen_var')
+  #    [exp] If you give the variation as 3, the bits of the gene is value of 0 ~ 2
+  #          like following array, [1, 0, 2, 1, 1, 2, 0 ...].
+  # 3. Array of arbitrary value (You give the array directly)
+  def initialize(gen=nil, gen_size=nil, gen_var=nil)
     @age = 0
     @gene = []
-    if gen == nil
-      $defaultGeneSize.times do |i|
-        if rand(2) == 0
-          @gene << true
-        else
-          @gene << false
+    @geneVariation = nil
+
+    if gen == nil  # Gene is boolean array of the default size.
+      if gen_size == nil
+        gen_size = $defaultGeneSize
+      else
+        if gen_size.class != Fixnum
+          raise "Invalid argument. 'gen_size' must be Fixnum."
         end
       end
-    else
-      if gen.class == Array
-        @gene = gen.dup
-      elsif gen.class == Fixnum
-        gen.times do
+
+      if gen_var == nil  # @gene is initialized as Array of boolean.
+        @geneVariation = 2
+      elsif gen_var.class == Fixnum
+        @geneVariation = gen_var
+      else
+        raise "Invalid argument. 'gen_var' must be Fixnum."
+      end
+
+      gen_size.times do |i|
+        if gen_var == nil
           if rand(2) == 0
             @gene << true
           else
             @gene << false
           end
+        else
+          @gene << rand(@geneVariation)
         end
-      else
+      end
+    else  # case of gen != nil
+      if gen.class == Array  # Gene is the array of arbitrary value.
+        @gene = gen.dup
+      else  # Other types of gene is not supported, so gene is set up as default.
         $defaultGeneSize.times do
           if rand(2) == 0
             @gene << true
@@ -41,9 +61,10 @@ class Individual
     end
   end
 
-  # Change $defaultGeneVariation to the var.
+  # Change @geneVariation to the var.
+  # 使うかな？
   def change_variation(var)
-    $defaultGeneVariation = var
+    @geneVariation = var
   end
 
   def gene_size
@@ -78,7 +99,23 @@ class Individual
     end
   end
 
+  # Each bit of first parent is checked with bit of second parent whether they are same.
+  # If same then the bit is taken for the offspring otherwise the bit from the third parent
+  # is taken for the offspring.
+  def three_parent_crossover(ary1, ary2, ary3)
+    tmp_ary = []
+    ary1.size.times do |i|
+      if ary1[i] == ary2[i]
+        tmp_ary[i] = ary2[i]
+      else
+        tmp_ary[i] = ary3[i]
+      end
+    end
+    return tmp_ary
+  end
+
   # Not destructive
+  # TODO @geneがboolean or Fixnum以外の場合も作成
   def mutation(percentage=0.05, method=nil)
     tmp_gene = @gene.dup
     if method == "inversion"
@@ -89,13 +126,13 @@ class Individual
       tmp_gene = mutation_move(tmp_gene)
     elsif method == "scramble"
       tmp_gene = mutation_scramble(tmp_gene)
-    else
+    else # Examine each bit of gene whether it's changed or not.
       tmp_gene.size.times do |i|
         if rand(100) < (percentage*100)
           if (tmp_gene[i] == true || tmp_gene[i] == false)
             tmp_gene[i] = !tmp_gene[i]
           elsif tmp_gene[i].class == Fixnum
-            tmp_gene[i] = rand($defaultGeneVariation)
+            tmp_gene[i] = rand(@geneVariation)
           end
         end
       end
@@ -104,6 +141,7 @@ class Individual
   end
 
   # Destructive
+  # TODO @geneがboolean or Fixnum以外の場合も作成
   def mutation!(percentage=0.05, method=nil)
     if method == "inversion"
       mutation_inversion(@gene)
@@ -113,13 +151,13 @@ class Individual
       mutation_move(@gene)
     elsif method == "scramble"
       mutation_scramble(@gene)
-    else
+    else  # Examine each bit of gene whether it's changed or not.
       @gene.size.times do |i|
         if rand(100) < (percentage*100)
           if (@gene[i] == true || @gene[i] == false)
             @gene[i] = !@gene[i]
           else
-            @gene[i] = rand($defaultGeneVariation)
+            @gene[i] = rand(@geneVariation)
           end
         end
       end
@@ -216,21 +254,6 @@ class Individual
 
       return res_ary
     end
-  end
-
-  # Each bit of first parent is checked with bit of second parent whether they are same.
-  # If same then the bit is taken for the offspring otherwise the bit from the third parent
-  # is taken for the offspring.
-  def three_parent_crossover(ary1, ary2, ary3)
-    tmp_ary = []
-    ary1.size.times do |i|
-      if ary1[i] == ary2[i]
-        tmp_ary[i] = ary2[i]
-      else
-        tmp_ary[i] = ary3[i]
-      end
-    end
-    return tmp_ary
   end
 
   def mutation_inversion(gene_ary)

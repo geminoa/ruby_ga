@@ -4,7 +4,7 @@ class Population
 
   def initialize(unit_num=$defaultUnitNum)
     @units = []
-    unit_num.times{|i| @units << Individual.new(nil)}
+    unit_num.times{|i| @units << Individual.new}
   end
 
   def crossover_all

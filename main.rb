@@ -16,9 +16,11 @@ def main
 
 	#p po.units
 
-#  p po.roulette_selection(method(:count_true))
-  p po.elite_selection(method(:count_true))
-  p po.rank_selection(method(:count_true))
+  units = []
+  units << po.roulette_selection(method(:count_true))
+  units << po.elite_selection(method(:count_true))
+  units << po.rank_selection(method(:count_true))
+  units.each{|unit| p unit.fitness(method(:count_true))} 
 end
 
 main()
