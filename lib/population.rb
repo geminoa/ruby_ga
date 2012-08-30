@@ -1,10 +1,49 @@
 class Population 
   $defaultUnitNum = 100
+  $crossoverProbability = 0.8
+  $mutationProbability = 0.05 
   attr_reader :units
 
   def initialize(unit_num=$defaultUnitNum)
     @units = []
     unit_num.times{|i| @units << Individual.new}
+  end
+
+  def go(fun)
+    rank = {}  # key: index of @unit, val: fitness.
+    @units.size.times do |i|
+      rank[i] = @units[i].fitness(fun)
+    end
+    rank = rank.sort_by{|k,v| v}  # Rearrange based on the fitness.
+    rank.reverse!
+
+    # Select parents move to the next generation.
+    new_units = []
+    orig_units_size = @units.size
+    while(new_units.size < orig_units_size)
+      #parent1 = roulette_selection!(fun)
+      parent1 = rank_selection!(fun)
+      parent1.get_older
+      #parent2 = roulette_selection!(fun)
+      parent2 = rank_selection!(fun)
+      parent2.get_older
+      if rand(100) < $crossoverProbability*100
+        2.times do |i|
+          child = parent1.crossover(parent2)
+          new_units << child if new_units.size < orig_units_size
+        end
+      end
+      new_units << parent1 if new_units.size < orig_units_size
+      new_units << parent2 if new_units.size < orig_units_size
+    end
+
+    # Mutation
+    new_units.each do |unit|
+      if rand(100) < $mutationProbability*100
+        unit.mutation
+      end
+    end
+    @units = new_units
   end
 
   # すべてのunitが総当たり的に交差する
@@ -62,8 +101,32 @@ class Population
     return sum / @units.size
   end
 
-  #private
-  def roulette_selection(fun) # methodを引数にとる
+  def roulette_selection(fun)
+    _roulette_selection(fun, nil)
+  end
+
+  def roulette_selection!(fun)
+    _roulette_selection(fun, true)
+  end
+
+  def elite_selection(fun)
+    _elite_selection(fun, nil)
+  end
+
+  def elite_selection!(fun)
+    _elite_selection(fun, true)
+  end
+
+  def rank_selection(fun)
+    _rank_selection(fun, nil)
+  end
+
+  def rank_selection!(fun)
+    _rank_selection(fun, true)
+  end
+
+  private
+  def _roulette_selection(fun, bang=nil) # methodを引数にとる
     # Calculate sum of all fitness in population.
     sum = 0
     @units.each do |unit|
@@ -71,27 +134,36 @@ class Population
     end
 
     # Select an unit 
-    border = rand(sum+1)
+    border = rand(sum)
     tmp_sum = 0
     @units.size.times do |i|
-      tmp_sum += units[i].fitness(fun)
+      tmp_sum += @units[i].fitness(fun)
       if tmp_sum > border
-        return @units.slice!(i)
+        if bang
+          return @units.slice!(i)
+        else
+          return @units[i]
+        end
       end
     end
+    puts "sum: #{sum}  tmp_sum: #{tmp_sum}  border: #{border}"
     return nil
   end
 
-  def elite_selection(fun)
+  def _elite_selection(fun, bang=nil)
     h = {}
     @units.size.times do |i|
       h[i] = @units[i].fitness(fun)
     end
     max_pos = h.sort_by{|k,v| v}.pop  # 評価関数が最大となるunitの位置
-    return @units.slice!(max_pos[0])
+    if bang
+      return @units.slice!(max_pos[0])
+    else
+      return @units[max_pos[0]]
+    end
   end
 
-  def rank_selection(fun)
+  def _rank_selection(fun, bang=nil)
     fitnesses = []
     @units.each do |unit|
       fitnesses << unit.fitness(fun)
@@ -112,16 +184,21 @@ class Population
     # 基準値を決める
     sum = 0
     ranked_fitnesses.each{|rfit| sum += rfit}
-    border = rand(sum+1)
+    border = rand(sum)
 
     # 判定
     tmp_sum = 0
     @units.size.times do |i|
       tmp_sum += ranked_fitnesses[i]
-      if tmp_sum >= border
-        return @units.slice!(i)
+      if tmp_sum > border
+        if bang
+          return @units.slice!(i)
+        else
+          return @units[i]
+        end
       end
     end
+    puts "sum: #{sum}  tmp_sum: #{tmp_sum}  border: #{border}"
     return nil
   end
 

@@ -9,23 +9,18 @@ def count_true(ary)
 end
 
 def main
-	po = Population.new 5
-	4.times do
-		po.crossover_all(true)
+	po = Population.new 50
+	200.times do
+		po.go(method(:count_true))
+    puts "fit: " + po.elite_selection(method(:count_true)).fitness(method(:count_true)).to_s
 	end
-	p po.units.size
+
   ary = []
   po.units.each do |unit|
      ary << unit.age
   end
   p ary.uniq
   p po.average_age
-
-  units = []
-  units << po.roulette_selection(method(:count_true))
-  units << po.elite_selection(method(:count_true))
-  units << po.rank_selection(method(:count_true))
-  units.each{|unit| p unit.fitness(method(:count_true))} 
 end
 
 main()
