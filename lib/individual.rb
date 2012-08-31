@@ -116,15 +116,16 @@ class Individual
 
   # Not destructive
   # TODO @geneがboolean or Fixnum以外の場合も作成
-  def mutation(percentage=0.05, method=nil)
+  def mutation(percentage=0.05, mutation_method=nil)
     tmp_gene = @gene.dup
-    if method == "inversion"
+    case mutation_method
+    when "inversion"
       tmp_gene = mutation_inversion(tmp_gene)
-    elsif method == "translocation"
+    when "translocation"
       tmp_gene = mutation_translocation(tmp_gene)
-    elsif method == "move"
+    when "move"
       tmp_gene = mutation_move(tmp_gene)
-    elsif method == "scramble"
+    when "scramble"
       tmp_gene = mutation_scramble(tmp_gene)
     else # Examine each bit of gene whether it's changed or not.
       tmp_gene.size.times do |i|

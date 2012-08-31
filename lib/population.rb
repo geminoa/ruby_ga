@@ -9,11 +9,42 @@ class Population
     unit_num.times{|i| @units << Individual.new}
   end
 
-  def go(fun)
+  def simple_ga(fun, selection=nil, mutation=nil)
+    # Crossover
+    if rand(100) > $crossoverProbability*100
+      @units.each{|unit| unit.get_older}
+      case selection
+      when "roulette"
+        parent1 = roulette_selection!(fun)
+        parent2 = roulette_selection!(fun)
+      when "elite"
+        parent1 = elite_selection!(fun)
+        parent2 = elite_selection!(fun)
+      else
+        parent1 = rank_selection!(fun)
+        parent2 = rank_selection!(fun)
+      end
+      child = parent1.crossover(parent2)
+      @units << parent1 << parent2 << child 
+      worst = drop_worst_unit(fun)
+    end
+    
+    # Mutation
+    @units.each do |unit|
+      if rand(100) < $mutationProbability*100
+        unit.mutation($mutationProbability, mutation)
+      end
+    end
+  end
+
+  # simple gaの改良版？名前が不明
+  def modified_ga(fun)
     rank = {}  # key: index of @unit, val: fitness.
     @units.size.times do |i|
+      @units[i].get_older
       rank[i] = @units[i].fitness(fun)
     end
+
     rank = rank.sort_by{|k,v| v}  # Rearrange based on the fitness.
     rank.reverse!
 
@@ -23,10 +54,8 @@ class Population
     while(new_units.size < orig_units_size)
       #parent1 = roulette_selection!(fun)
       parent1 = rank_selection!(fun)
-      parent1.get_older
       #parent2 = roulette_selection!(fun)
       parent2 = rank_selection!(fun)
-      parent2.get_older
       if rand(100) < $crossoverProbability*100
         2.times do |i|
           child = parent1.crossover(parent2)
@@ -75,30 +104,33 @@ class Population
     end
   end
 
-  # Terminate units which age is over the 'limit_age'.
-  def terminate_by_age(limit_age=5)
-    tmp_units = []
-    @units.each do |un|
-      if un.age < limit_age
-        tmp_units << un
-      end
-    end
-    @units = tmp_units
-    return nil
-  end
-
-  def terminate_random(num)
-    num.times do
-      @units.slice!(rand(@units.size))
-    end
-  end
-
   def average_age
     sum = 0.0
     @units.each do |unit|
       sum += unit.age
     end
     return sum / @units.size
+  end
+
+  def average_fitness(fun)
+    sum = 0.0
+    @units.each do |unit|
+      sum += unit.fitness(fun)
+    end
+    return sum / @units.size
+  end
+
+  def drop_worst_unit(fun)
+    idx = nil
+    worst_fit = nil 
+    @units.size.times do |i|
+      tmp_fit = @units[i].fitness(fun)
+      if worst_fit == nil || tmp_fit < worst_fit
+        idx = i
+        worst_fit = tmp_fit
+      end
+    end
+    return @units.slice!(idx)
   end
 
   def roulette_selection(fun)
@@ -123,6 +155,24 @@ class Population
 
   def rank_selection!(fun)
     _rank_selection(fun, true)
+  end
+
+  # Terminate units which age is over the 'limit_age'.
+  def terminate_by_age(limit_age=5)
+    tmp_units = []
+    @units.each do |un|
+      if un.age < limit_age
+        tmp_units << un
+      end
+    end
+    @units = tmp_units
+    return nil
+  end
+
+  def terminate_random(num)
+    num.times do
+      @units.slice!(rand(@units.size))
+    end
   end
 
   private
