@@ -146,7 +146,6 @@ class Population
         end
       end
     end
-    puts "sum: #{sum}  tmp_sum: #{tmp_sum}  border: #{border}"
     return nil
   end
 
@@ -176,9 +175,11 @@ class Population
     end
 
     # 適合度の値を順位に変換
+    # 順位は1位,2位,...とする。0位からにすると、すべてが0位になったときに
+    # sumが0になってしまうので、計算エラーになってしまう
     ranked_fitnesses = [] # 順位に変換された適合度を格納
     fitnesses.each do |fit|
-      ranked_fitnesses << rank.index(fit)
+      ranked_fitnesses << rank.index(fit) + 1
     end
 
     # 基準値を決める
@@ -198,7 +199,6 @@ class Population
         end
       end
     end
-    puts "sum: #{sum}  tmp_sum: #{tmp_sum}  border: #{border}"
     return nil
   end
 
