@@ -10,19 +10,23 @@ def count_true(ary)
 end
 
 def main
-  ["roulette", "elite", "rank"].each do |sel|
+  ["roulette", "elite", "tournament", "rank"].each do |sel|
+    gpl_cmd = "plot"
     ["inversion", "translocation", "move", "scramble", "else"].each do |mut|
       po = Population.new 50
-      p po.average_fitness(method(:count_true))
+      fun = method(:count_true)
+      p po.average_fitness(fun)
       file = open("dat/evo_#{sel}_#{mut}.dat", "w+")
-      500.times do |i|
-        po.simple_ga(method(:count_true), sel, mut)
-        #po.modified_ga(method(:count_true))
-        #puts "fit: " + po.elite_selection(method(:count_true)).fitness(method(:count_true)).to_s
-        file.write("#{i} #{po.average_fitness(method(:count_true))}\n")
+      1000.times do |i|
+        po.simple_ga(fun, sel, mut)
+        #po.modified_ga(fun)
+        #puts "fit: " + po.elite_selection(fun).fitness(fun).to_s
+        file.write("#{i} #{po.average_fitness(fun)}\n")
       end
       file.close
+      gpl_cmd += " 'evo_#{sel}_#{mut}.dat' w l,"
     end
+    open("dat/#{sel}.gpl", "w+") {|f| f.write(gpl_cmd)}
   end
 end
 

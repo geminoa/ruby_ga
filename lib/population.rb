@@ -2,6 +2,7 @@ class Population
   $defaultUnitNum = 100
   $crossoverProbability = 0.8
   $mutationProbability = 0.05 
+  $tournamentSize = 4
   attr_reader :units
 
   def initialize(unit_num=$defaultUnitNum)
@@ -20,6 +21,9 @@ class Population
       when "elite"
         parent1 = elite_selection!(fun)
         parent2 = elite_selection!(fun)
+      when "tournament"
+        parent1 = tournament_selection!(fun)
+        parent2 = tournament_selection!(fun)
       else
         parent1 = rank_selection!(fun)
         parent2 = rank_selection!(fun)
@@ -157,6 +161,14 @@ class Population
     _rank_selection(fun, true)
   end
 
+  def tournament_selection(fun)
+    _tournament_selection(fun, nil)
+  end
+
+  def tournament_selection!(fun)
+    _tournament_selection(fun, true)
+  end
+
   # Terminate units which age is over the 'limit_age'.
   def terminate_by_age(limit_age=5)
     tmp_units = []
@@ -252,4 +264,26 @@ class Population
     return nil
   end
 
+  def _tournament_selection(fun, bang=nil)
+    indice = (0..@units.size-1).to_a  # くじ
+    units_fitness = {}
+    $tournamentSize.times do |i|
+      idx = indice.slice!(rand(indice.size))
+      units_fitness[idx] = @units[idx].fitness(fun)
+    end
+    max_fit = nil
+    max_idx = nil
+    units_fitness.each{|idx, fit|
+      if max_fit == nil || max_fit < fit
+        max_fit = fit
+        max_idx = idx
+      end
+    }
+
+    if bang
+      return @units.slice!(max_idx)
+    else
+      return @units[max_idx]
+    end
+  end
 end
