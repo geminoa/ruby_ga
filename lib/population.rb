@@ -5,9 +5,15 @@ class Population
   $tournamentSize = 4
   attr_reader :units
 
-  def initialize(unit_num=$defaultUnitNum)
+  def initialize(rbga_conf=nil)
+    if rbga_conf.class != RubyGAConfig
+      raise 'Invalid config. Class of config must be RubyGAConfig.'
+    end
+
     @units = []
-    unit_num.times{|i| @units << Individual.new}
+    rbga_conf.units_num.times do |i|
+      @units << Individual.new(rbga_conf.gene_size, rbga_conf.gene_var, rbga_conf.gene)
+    end
   end
 
   def simple_ga(fun, selection=nil, mutation=nil)
@@ -77,6 +83,13 @@ class Population
       end
     end
     @units = new_units
+  end
+
+  # Add individual into the @units.
+  def add(individual)
+    if individual.class == Individual
+      @units << individual
+    end
   end
 
   # すべてのunitが総当たり的に交差する

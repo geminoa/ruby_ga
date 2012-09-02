@@ -1,61 +1,34 @@
 class Individual 
-
-  $defaultGeneSize = 50
   $debug = false 
 
   attr_reader :age
 
   # You can design the gene structure as the argument 'gen'.
   # Currently, the types of gene are
-  # 1. Array of boolean (You give the size of the array as 'gen_size', or the size
-  #    is $defaultGeneSize if the size is not given)
+  # 1. Array of boolean (You give the size of the array as 'gen_size'.)
   # 2. Array of Fixnum (You give the variation of gene as 'gen_var')
   #    [exp] If you give the variation as 3, the bits of the gene is value of 0 ~ 2
   #          like following array, [1, 0, 2, 1, 1, 2, 0 ...].
   # 3. Array of arbitrary value (You give the array directly)
-  def initialize(gen=nil, gen_size=nil, gen_var=nil)
+  def initialize(gen_size, gen_var=nil, gen=nil)
     @age = 0
     @gene = []
-    @geneVariation = nil
+    if gen_var == nil
+      gen_var = [true, false]
+    elsif gen_var.class != Array
+      raise 'Class of gen_var must be Array'
+    end
 
     if gen == nil  # Gene is boolean array of the default size.
-      if gen_size == nil
-        gen_size = $defaultGeneSize
-      else
-        if gen_size.class != Fixnum
-          raise "Invalid argument. 'gen_size' must be Fixnum."
-        end
-      end
-
-      if gen_var == nil  # @gene is initialized as Array of boolean.
-        @geneVariation = 2
-      elsif gen_var.class == Fixnum
-        @geneVariation = gen_var
-      else
-        raise "Invalid argument. 'gen_var' must be Fixnum."
-      end
-
       gen_size.times do |i|
-        if gen_var == nil
-          if rand(2) == 0
-            @gene << true
-          else
-            @gene << false
-          end
-        else
-          @gene << rand(@geneVariation)
-        end
+        @gene << gen_var[rand(gene_var.size)]
       end
     else  # case of gen != nil
       if gen.class == Array  # Gene is the array of arbitrary value.
         @gene = gen.dup
       else  # Other types of gene is not supported, so gene is set up as default.
-        $defaultGeneSize.times do
-          if rand(2) == 0
-            @gene << true
-          else
-            @gene << false
-          end
+        gen_size.times do
+          @gene << gen_var[rand(gene_var.size)]
         end
       end
     end
