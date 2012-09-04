@@ -5,30 +5,25 @@ class Individual
 
   # You can design the gene structure as the argument 'gen'.
   # Currently, the types of gene are
-  # 1. Array of boolean (You give the size of the array as 'gen_size'.)
-  # 2. Array of Fixnum (You give the variation of gene as 'gen_var')
+  # 1. Array of boolean (You give the size of the array as 'gene_size'.)
+  # 2. Array of Fixnum (You give the variation of gene as 'gene_var')
   #    [exp] If you give the variation as 3, the bits of the gene is value of 0 ~ 2
   #          like following array, [1, 0, 2, 1, 1, 2, 0 ...].
   # 3. Array of arbitrary value (You give the array directly)
-  def initialize(gen_size, gen_var=nil, gen=nil)
+  def initialize(gene_size, gene_var, gen=nil)
     @age = 0
     @gene = []
-    if gen_var == nil
-      gen_var = [true, false]
-    elsif gen_var.class != Array
-      raise 'Class of gen_var must be Array'
-    end
 
-    if gen == nil  # Gene is boolean array of the default size.
-      gen_size.times do |i|
-        @gene << gen_var[rand(gene_var.size)]
+    if gen == nil
+      gene_size.times do |i|
+        @gene << gene_var[rand(gene_var.size)]
       end
     else  # case of gen != nil
       if gen.class == Array  # Gene is the array of arbitrary value.
         @gene = gen.dup
       else  # Other types of gene is not supported, so gene is set up as default.
-        gen_size.times do
-          @gene << gen_var[rand(gene_var.size)]
+        gene_size.times do
+          @gene << gene_var[rand(gene_var.size)]
         end
       end
     end
@@ -59,7 +54,7 @@ class Individual
   end
 
   # Generate new generation individual.
-  def crossover(pa=nil, gen_method="default")
+  def crossover(pa=nil, gen_method="uniform")
     if pa.gene.size == @gene.size
       if gen_method.class == Fixnum
         gene_ary = multi_point_crossover(@gene, pa.gene, gen_method)
@@ -166,7 +161,7 @@ class Individual
       one_point_crossover(ary1, ary2)
     else
       if po_num > ary1.size
-        puts "Error: too many numbers!"
+        puts "Error: too many point number!"
         return nil
       end
 

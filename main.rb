@@ -25,12 +25,10 @@ def generate_points(pnum=100, xrange=200, yrange=200)
 end
 
 def main
-  points = generate_points(20)
-  (points.size-1).size.times do |i|
-    p distance(points[i], points[i+1])
-  end
-  po = Population.new
-  pp po.units.size
+  conf = RubyGAConfig.new
+  pp conf
+  po = Population.new conf
+  fun = method(:count_true)
 end
 
 def test_simple_ga
