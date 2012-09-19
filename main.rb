@@ -32,12 +32,12 @@ def main
 end
 
 def test_simple_ga
+  conf = RubyGAConfig.new(100, 50)
   ["roulette", "elite", "tournament", "rank"].each do |sel|
     gpl_cmd = "plot"
     ["inversion", "translocation", "move", "scramble", "else"].each do |mut|
-      po = Population.new
+      po = Population.new conf
       fun = method(:count_true)
-      p po.average_fitness(fun)
       file = open("dat/evo_#{sel}_#{mut}.dat", "w+")
       2000.times do |i|
         po.simple_ga(fun, sel, mut)
@@ -47,10 +47,13 @@ def test_simple_ga
       end
       file.close
       gpl_cmd += " 'evo_#{sel}_#{mut}.dat' w l,"
+
+      puts "selection=#{sel}, muration=#{mut}, avg=#{po.average_fitness(fun)}, dev=#{po.deviation_fitness(fun)}"
     end
     gpl_cmd.chop!
     open("dat/#{sel}.gpl", "w+") {|f| f.write(gpl_cmd)}
   end
 end
 
-main()
+test_simple_ga
+#main()

@@ -12,6 +12,7 @@ class Individual
   # 3. Array of arbitrary value (You give the array directly)
   def initialize(gene_size, gene_var, gen=nil)
     @age = 0
+    @gene_var = gene_var
     @gene = []
 
     if gen == nil
@@ -61,7 +62,7 @@ class Individual
       else
         gene_ary = uniform_crossover(@gene, pa.gene)
       end
-      return Individual.new(gene_ary)
+      return Individual.new(@gene.size,  @gene_var, gene_ary)
     else
       return "different spiecies!"
     end

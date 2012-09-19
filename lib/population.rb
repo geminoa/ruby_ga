@@ -137,6 +137,15 @@ class Population
     return sum / @units.size
   end
 
+  def deviation_fitness(fun)
+    sum = 0.0
+    avg = average_fitness(fun)
+    @units.each do |unit|
+      sum += Math::sqrt( (unit.fitness(fun) - avg)**2 )
+    end
+    return sum / (@units.size - 1)
+  end
+
   def drop_worst_unit(fun)
     idx = nil
     worst_fit = nil 
