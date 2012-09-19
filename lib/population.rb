@@ -12,7 +12,7 @@ class Population
 
     @units = []
     rbga_conf.unit_num.times do |i|
-      @units << Individual.new(rbga_conf.gene_size, rbga_conf.gene_var, rbga_conf.generate_gene)
+      @units << Individual.new(rbga_conf.gene_size, rbga_conf.gene_var, rbga_conf.genes[i])
     end
   end
 

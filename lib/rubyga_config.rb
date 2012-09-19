@@ -73,9 +73,9 @@ class RubyGAConfig
       @gene_size = gene_size
     else
       if @genes[0].class == Array  # ２次元配列の場合
-        @gene_var = @genes[0].uniq
+        @gene_size = @genes[0].uniq.size
       else   # 単純な配列の場合
-        @gene_var = @genes.uniq
+        @gene_size = @genes.uniq.size
       end
     end
 
@@ -145,6 +145,7 @@ class RubyGAConfig
       @gene_var.size.times do |i|
         bits << tmp_gene.slice!(rand(tmp_gene.size))
       end
+      bits << bits[0]
     end
     return bits
   end
