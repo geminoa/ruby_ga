@@ -226,6 +226,86 @@ class Individual
     end
   end
 
+  # 両親それぞれ左からn個ずつ遺伝子をとっていく
+  # parent1 [a,b,c,d,e,...]
+  # parent2 [A,B,C,D,E,...]
+  # n = 2の場合、
+  # child   [a,b,A,B,c,d,...]
+  #
+  # cnum: cut number.
+  # dup: allow duplication or not.
+  def cut_from_left_crossover(orig_ary1, orig_ary2, cnum=3, dup=false)
+    if cnum < 1
+      raise 'cnum must be larger than 1.'
+    end
+    ary1 = orig_ary1.dup
+    ary2 = orig_ary2.dup
+    ary_size = ary1.size
+    res_ary = []
+    flg = true
+    while(res_ary.size < ary_size)
+      cnum.times do |i|
+        if flg == true
+          res_ary << ary1.shift
+        else
+          res_ary << ary2.shift
+        end
+        res_ary.uniq!
+        break if res_ary.size == ary_size
+      end
+      break if res_ary.size == ary_size
+      flg = !flg
+    end
+    return res_ary
+  end
+
+  # 両親から縫うように互いにn個ずつ遺伝子をとっていく
+  # parent1 [a,b,c,d,e,...]
+  # parent2 [A,B,C,D,E,...]
+  # n = 2の場合、
+  # child   [a,b,C,D,e,f,...]
+  #
+  # cnum: cut number.
+  # dup: allow duplication or not.
+  def stitch_crossover(ary1, ary2, cnum=3, dup=false)
+    if cnum < 1
+      raise 'cnum must be larger than 1.'
+    end
+    ary_size = ary1.size
+    tmp_ary = []
+    flg = true
+    cnt = 0
+    2.times do |turn|
+      ary_size.times do |i|
+        if turn == 0
+          if flg == true
+            tmp_ary << ary1[i]
+          else
+            tmp_ary << ary2[i]
+          end
+        else
+          if flg == false
+            tmp_ary << ary1[i]
+          else
+            tmp_ary << ary2[i]
+          end
+        end
+        cnt += 1
+        if cnt == cnum
+          flg = !flg
+          cnt = 0
+        end
+      end
+    end
+    res_ary = tmp_ary.slice!(0, ary_size)
+    res_ary.uniq!
+    until(res_ary.size == ary_size)
+      res_ary << tmp_ary.shift
+      res_ary.uniq!
+    end
+    return res_ary
+  end
+
   def mutation_inversion(gene_ary)
     idx1 = rand(gene_ary.size)
     idx2 = idx1 
