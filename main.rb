@@ -11,14 +11,17 @@ def count_true(ary)
 end
 
 # TPSで使う評価関数
-def sum_distances(ary)
+def sum_distances(gene_ary)
   sum = 0.0
   i = 0
-  while(i < ary.size - 1)
-    sum += distance(ary[i], ary[i+1])
+  while(i < gene_ary.size - 1)
+    dist = distance($points[gene_ary[i]], $points[gene_ary[i+1]])
+    #puts "points: #{points[gene_ary[i]]}, #{points[gene_ary[i+1]]}"
+    #puts "dist: #{dist}"
+    sum += dist
     i += 1
   end
-  return 1.0/sum + 100
+  return 1.0/sum * 10000
 end
 
 def distance(p1, p2)
@@ -47,9 +50,21 @@ def generate_points(pnum=100, xrange=200, yrange=200, uniq=true)
   return points
 end
 
+$points = generate_points
 def main
-  points = generate_points
-  conf = RubyGAConfig.new(unit_num=nil, gene_size=nil, gene_var=(0..99).to_a, genes=[])
+  conf = RubyGAConfig.new(
+    unit_num=50,
+    gene_size=nil,
+    gene_var=(0..99).to_a,
+    genes=[],
+    fitness=nil,
+    selection=nil,
+    mutation="inversion",
+    crossover="cut_from_left",
+    crossoverProbability=nil,
+    mutationProbability=nil,
+    desc="TSP test"
+  )
   genes = []
   conf.unit_num.times{|i|
     genes << conf.generate_gene(cond="tsp")
@@ -59,14 +74,39 @@ def main
   conf.fitness = fun
   po = Population.new conf
 
-  100.times do |i|
+  3000.times do |i|
     po.simple_ga(conf.fitness, conf.selection, conf.mutation)
-    puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
+    if i%100 == 0
+      puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
+      #puts "best=#{po.elite_selection(conf.fitness).fitness(conf.fitness)}"
+      open("dat/points#{i}.dat", "w+"){|f|
+        best_unit = po.elite_selection(conf.fitness)
+        puts "best_unit uniq size: #{best_unit.gene.uniq.size}"
+        #p best_unit.gene
+        best_unit.gene.each do |idx|
+          point = $points[best_unit.gene[idx]]
+          f.write "#{point[0]} #{point[1]}\n"
+        end
+        f.write "#{$points[best_unit.gene[0]][0]} #{$points[best_unit.gene[0]][1]}\n"  # 元の位置に戻るように最初の点を追加する
+      }
+    end
   end
 end
 
 def test_simple_ga
-  conf = RubyGAConfig.new(100, 50)
+  conf = RubyGAConfig.new(
+    unit_num=100,
+    gene_size=50,
+    gene_var=nil,
+    genes=nil,
+    fitness=nil,
+    selection=nil,
+    mutation=nil,
+    crossover=nil,
+    crossoverProbability=nil,
+    mutationProbability=nil,
+    desc="simple GA(?) test"
+  )
   ["roulette", "elite", "tournament", "rank"].each do |sel|
     gpl_cmd = "plot"
     ["inversion", "translocation", "move", "scramble", "else"].each do |mut|

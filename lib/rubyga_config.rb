@@ -5,8 +5,10 @@ class RubyGAConfig
   $defaultSelection = "roulette"
   $defaultMutation = nil
   $defaultCrossover = "uniform"
+  $defaultCrossoverProbability = 0.8
+  $defaultMutationProbability = 0.05 
 
-  attr_accessor :unit_num, :gene_size, :gene_var, :genes, :fitness, :selection, :mutation, :crossover, :desc
+  attr_accessor :unit_num, :gene_size, :gene_var, :genes, :fitness, :selection, :mutation, :crossover, :crossoverProbability, :mutationProbability, :desc
   def initialize(
     unit_num=nil,   # Number of unit (or individual) of the population.
     gene_size=nil,  # Size of gene of an individual.
@@ -16,6 +18,8 @@ class RubyGAConfig
     selection=nil,  # Selection method (roulette, rank, elite, tournament).
     mutation=nil,   # Mutation method (inversion, translocation, move, scramble or nil(examine each bit of gene to mutate) ).
     crossover=nil,  # Crossover method. Default is uniform crossover. You can give the argument as Fixnum(single or multi-point crossover).
+    crossoverProbability=nil,
+    mutationProbability=nil,
     desc=nil        # Description.
   )
   #if genes.class != Array
@@ -103,7 +107,7 @@ class RubyGAConfig
   else
     @mutation = mutation
   end
-  
+
   if selection == nil
     @selection = $defaultSelection
   else
@@ -116,13 +120,25 @@ class RubyGAConfig
     @crossover = crossover
   end
 
+  if crossoverProbability == nil
+    @crossoverProbability = $defaultCrossoverProbability
+  else
+    @crossoverProbability = crossoverProbability
+  end
+
+  if mutationProbability == nil
+    @mutationProbability = $defaultMutationProbability
+  else
+    @mutationProbability = mutationProbability
+  end
+
   if desc == nil
     @desc = ""
   else
     @desc = desc
   end
 
-  end
+  end  # of initialize
 
   # Generate gene to give the population.
   # Arguments: 
@@ -145,7 +161,6 @@ class RubyGAConfig
       @gene_var.size.times do |i|
         bits << tmp_gene.slice!(rand(tmp_gene.size))
       end
-      bits << bits[0]
     end
     return bits
   end

@@ -1,24 +1,25 @@
 class Population 
-  $defaultUnitNum = 100
-  $crossoverProbability = 0.8
-  $mutationProbability = 0.05 
+  # TODO: to give tournamentSize as the member of RubyGAConfig.
   $tournamentSize = 4
-  attr_reader :units
 
+  attr_reader :units
   def initialize(rbga_conf=nil)
     if rbga_conf.class != RubyGAConfig
       raise 'Invalid config. Class of config must be RubyGAConfig.'
     end
 
+    @crossoverProbability = rbga_conf.crossoverProbability
+    @mutationProbability = rbga_conf.mutationProbability
+    @tournamentSize = $tournamentSize
     @units = []
     rbga_conf.unit_num.times do |i|
-      @units << Individual.new(rbga_conf.gene_size, rbga_conf.gene_var, rbga_conf.genes[i])
+      @units << Individual.new(rbga_conf.gene_size, rbga_conf.gene_var, rbga_conf.genes[i], @mutationProbability)
     end
   end
 
-  def simple_ga(fun, selection=nil, mutation=nil)
+  def simple_ga(fun, selection=nil, mutation_method=nil)
     # Crossover
-    if rand(100) > $crossoverProbability*100
+    if rand(100) > @crossoverProbability*100
       @units.each{|unit| unit.get_older}
       case selection
       when "roulette"
@@ -30,19 +31,23 @@ class Population
       when "tournament"
         parent1 = tournament_selection!(fun)
         parent2 = tournament_selection!(fun)
-      else
+      when "rank" 
         parent1 = rank_selection!(fun)
         parent2 = rank_selection!(fun)
+      else
+        raise "selection method is invalid!"
       end
-      child = parent1.crossover(parent2)
-      @units << parent1 << parent2 << child 
-      worst = drop_worst_unit(fun)
+      child1, child2 = parent1.crossover(parent2)
+      @units << parent1 << parent2 << child1 << child2 
+      2.times do
+        worst = drop_worst_unit(fun)
+      end
     end
     
     # Mutation
     @units.each do |unit|
-      if rand(100) < $mutationProbability*100
-        unit.mutation($mutationProbability, mutation)
+      if rand(100) < @mutationProbability*100
+        unit.mutation(@mutationProbability, mutation_method)
       end
     end
   end
@@ -66,11 +71,10 @@ class Population
       parent1 = rank_selection!(fun)
       #parent2 = roulette_selection!(fun)
       parent2 = rank_selection!(fun)
-      if rand(100) < $crossoverProbability*100
-        2.times do |i|
-          child = parent1.crossover(parent2)
-          new_units << child if new_units.size < orig_units_size
-        end
+      if rand(100) < @crossoverProbability*100
+        child1, child2 = parent1.crossover(parent2)
+        new_units << child1 if new_units.size < orig_units_size
+        new_units << child2 if new_units.size < orig_units_size
       end
       new_units << parent1 if new_units.size < orig_units_size
       new_units << parent2 if new_units.size < orig_units_size
@@ -78,7 +82,7 @@ class Population
 
     # Mutation
     new_units.each do |unit|
-      if rand(100) < $mutationProbability*100
+      if rand(100) < @mutationProbability*100
         unit.mutation
       end
     end
@@ -89,35 +93,6 @@ class Population
   def add(individual)
     if individual.class == Individual
       @units << individual
-    end
-  end
-
-  # すべてのunitが総当たり的に交差する
-  # If you would remain parents in the population, give double_up = true. 
-  def crossover_all(double_up=nil)
-    tmp_units = @units.dup
-    unit = tmp_units.shift
-
-    old_units = []
-    new_units = []
-    while(tmp_units.size > 0)
-      tmp_units.each do |tu|
-        new_units << unit.crossover(tu)
-      end
-      unit.get_older
-      old_units << unit
-      unit = tmp_units.shift
-
-      if tmp_units.size == 0
-        unit.get_older 
-        old_units << unit
-      end
-    end
-
-    if double_up == true 
-      @units = old_units + new_units
-    else
-      @units = new_units
     end
   end
 
@@ -289,7 +264,7 @@ class Population
   def _tournament_selection(fun, bang=nil)
     indice = (0..@units.size-1).to_a  # くじ
     units_fitness = {}
-    $tournamentSize.times do |i|
+    @tournamentSize.times do |i|
       idx = indice.slice!(rand(indice.size))
       units_fitness[idx] = @units[idx].fitness(fun)
     end
