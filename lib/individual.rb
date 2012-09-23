@@ -55,12 +55,25 @@ class Individual
   end
 
   # Generate new generation individual.
-  def crossover(pa=nil, gen_method="uniform")
+  def crossover(pa, crossover_method, opt=nil)
+    if pa.class != Individual
+      raise "Parent's class is invalid!"
+    end
+
     if pa.gene.size == @gene.size
-      if gen_method.class == Fixnum
-        gene1, gene2 = multi_point_crossover(@gene, pa.gene, gen_method)
-      else
+      if crossover_method.class == Fixnum
+        gene1, gene2 = multi_point_crossover(@gene, pa.gene, crossover_method)
+      end
+
+      case crossover_method
+      when "uniform"
         gene1, gene2 = uniform_crossover(@gene, pa.gene)
+      when "cut_from_left"
+        gene1, gene2 = cut_from_left_crossover(@gene, pa.gene)
+      when "stitch"
+        gene1, gene2 = stitch_crossover(@gene, pa.gene)
+      else
+        raise "Crossover method is invalid!"
       end
       child1 = Individual.new(@gene.size,  @gene_var, gene1 , @mutationProbability)
       child2 = Individual.new(@gene.size,  @gene_var, gene2 , @mutationProbability)
@@ -215,21 +228,23 @@ class Individual
   #
   # cnum: cut number.
   # dup: allow duplication or not.
-  def cut_from_left_crossover(orig_ary1, orig_ary2, cnum=3)
+  def cut_from_left_crossover(genes1, genes2, cnum=2)
     if cnum < 1
       raise 'cnum must be larger than 1.'
     end
-    ary_size = ary1.size
+    ary_size = genes1.size
     res_ary = []
     flg = true
     2.times do
+      ary1 = genes1.dup
+      ary2 = genes2.dup
       tmp_ary = []
       ary_size.times do |i|
         cnum.times do
           if flg == true
-            tmp_ary << ary1[i]
+            tmp_ary << ary1.shift
           else
-            tmp_ary << ary2[i]
+            tmp_ary << ary2.shift
           end
           tmp_ary.uniq!
           break if tmp_ary.size == ary_size
@@ -242,7 +257,7 @@ class Individual
     end
 
     child1 = res_ary[0]
-    child2 = res_ary[0]
+    child2 = res_ary[1]
     return child1, child2
   end
 
@@ -254,29 +269,29 @@ class Individual
   #
   # cnum: cut number.
   # dup: allow duplication or not.
-  def stitch_crossover(ary1, ary2, cnum=3)
+  def stitch_crossover(genes1, genes2, cnum=2)
     if cnum < 1
       raise 'cnum must be larger than 1.'
     end
-    ary_size = ary1.size
+    ary_size = genes1.size
     res_ary = []
     cnt = 0
     2.times do  # child1, 2で２回
-      tmp_ary = []  # ary1, 2の遺伝子をcnumずつtmp_aryに入れていく
+      tmp_ary = []  # genes1, 2の遺伝子をcnumずつtmp_aryに入れていく
       2.times do |turn|
         switch = true
         ary_size.times do |i|
-          if turn == 0  # ary1からtmp_aryに入れていく
+          if turn == 0  # genes1からtmp_aryに入れていく
             if switch == true
-              tmp_ary << ary1[i]
+              tmp_ary << genes1[i]
             else
-              tmp_ary << ary2[i]
+              tmp_ary << genes2[i]
             end
-          else  # ary2からtmp_aryに入れていく
+          else  # genes2からtmp_aryに入れていく
             if switch == false
-              tmp_ary << ary1[i]
+              tmp_ary << genes1[i]
             else
-              tmp_ary << ary2[i]
+              tmp_ary << genes2[i]
             end
           end
           cnt += 1

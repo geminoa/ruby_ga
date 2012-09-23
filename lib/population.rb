@@ -8,6 +8,7 @@ class Population
       raise 'Invalid config. Class of config must be RubyGAConfig.'
     end
 
+    @crossover = rbga_conf.crossover
     @crossoverProbability = rbga_conf.crossoverProbability
     @mutationProbability = rbga_conf.mutationProbability
     @tournamentSize = $tournamentSize
@@ -37,7 +38,7 @@ class Population
       else
         raise "selection method is invalid!"
       end
-      child1, child2 = parent1.crossover(parent2)
+      child1, child2 = parent1.crossover(parent2, @crossover)
       @units << parent1 << parent2 << child1 << child2 
       2.times do
         worst = drop_worst_unit(fun)

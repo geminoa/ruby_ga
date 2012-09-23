@@ -50,17 +50,30 @@ def generate_points(pnum=100, xrange=200, yrange=200, uniq=true)
   return points
 end
 
-$points = generate_points
+$point_num = 500
+$points = [
+  [0,80],
+  [0,-80],
+  [60,60],
+  [-60,-60],
+  [-60,60],
+  [60,-60],
+  [80,0],
+  [-80,0]
+]
+$points = generate_points($point_num)
+
 def main
   conf = RubyGAConfig.new(
     unit_num=50,
     gene_size=nil,
-    gene_var=(0..99).to_a,
+    gene_var=(0..($point_num-1)).to_a,
     genes=[],
     fitness=nil,
     selection=nil,
     mutation="inversion",
     crossover="cut_from_left",
+    #crossover="stitch",
     crossoverProbability=nil,
     mutationProbability=nil,
     desc="TSP test"
@@ -74,14 +87,14 @@ def main
   conf.fitness = fun
   po = Population.new conf
 
-  3000.times do |i|
+  gnuplot_str = "set xrange [-100:100]\nset yrange[-100:100]\n"
+  5000.times do |i|
     po.simple_ga(conf.fitness, conf.selection, conf.mutation)
-    if i%100 == 0
+    if i%500 == 0
       puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
       #puts "best=#{po.elite_selection(conf.fitness).fitness(conf.fitness)}"
       open("dat/points#{i}.dat", "w+"){|f|
         best_unit = po.elite_selection(conf.fitness)
-        puts "best_unit uniq size: #{best_unit.gene.uniq.size}"
         #p best_unit.gene
         best_unit.gene.each do |idx|
           point = $points[best_unit.gene[idx]]
@@ -89,8 +102,12 @@ def main
         end
         f.write "#{$points[best_unit.gene[0]][0]} #{$points[best_unit.gene[0]][1]}\n"  # 元の位置に戻るように最初の点を追加する
       }
+
+      gnuplot_str += 'plot "points' + i.to_s + '.dat" with linespoints' + "\n"
+      gnuplot_str += "pause 1\n"
     end
   end
+  open("dat/plot.gpl", "w+"){|f| f.write(gnuplot_str)}
 end
 
 def test_simple_ga
