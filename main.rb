@@ -1,13 +1,60 @@
 require "ruby_ga"
 require "pp"
 
-# test_simple_gaで使う評価関数
-def count_true(ary)
-  sum = 0
-  ary.each do |a|
-    sum += 1 if a == true
+# ナップサック問題で使う評価関数
+def sum_items(gene_ary)
+  max_weight = 80 
+  penalty = 100
+  item_set = [
+    [2,21], [10,22], [7,28], [2,21], [4,12],
+    [9,24], [10,15], [7,2], [8,25], [5,28],  # 10
+    [3,4],[10,22],[9,36],[8,2],[8,7],
+    [5,40],[7,14],[3,40],[9,33],[7,21],  # 20
+    [2,28],[10,22],[7,14],[9,36],[7,28],
+    [2,21],[10,18],[4,12],[9,24],[10,15],  # 30
+    [4,21],[7,2],[8,25],[5,28],[2,28],
+    [3,4],[10,22],[9,36],[7,31],[8,2],  # 40
+    [8,7],[5,40],[7,14],[5,4],[7,28],
+    [3,40],[9,33],[7,35],[7,21],[9,20]  # 50
+  ]
+  total_weight = 0
+  total_val = 0
+  item_set.size.times do |i|
+    if gene_ary[i] == true
+      total_weight += item_set[i][0]
+      total_val += item_set[i][1]
+    end
   end
-  return sum
+  #puts "w: #{total_weight}"; puts "v: #{total_val}"
+  if total_weight > max_weight
+    total_val = penalty
+  end
+  return total_val
+end
+
+def main
+  conf = RubyGAConfig.new(
+    unit_num=32,
+    gene_size=50,
+    gene_var=nil,
+    genes=nil,
+    fitness=nil,
+    selection="tournament",
+    mutation="inversion",
+    crossover="uniform",
+    crossoverProbability=nil,
+    mutationProbability=nil,
+    desc="knapsack test"
+  )
+  conf.fitness = method(:sum_items)
+  po = Population.new conf
+  10000.times do |i|
+    po.simple_ga(conf.fitness, conf.selection, conf.mutation)
+    if i%1 == 0
+      puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
+      puts "total_val=#{po.elite_selection(conf.fitness).fitness(conf.fitness)}"
+    end
+  end
 end
 
 # TPSで使う評価関数
@@ -63,7 +110,7 @@ $points = [
 ]
 $points = generate_points($point_num)
 
-def main
+def test_tsp
   conf = RubyGAConfig.new(
     unit_num=50,
     gene_size=nil,
@@ -108,6 +155,15 @@ def main
     end
   end
   open("dat/plot.gpl", "w+"){|f| f.write(gnuplot_str)}
+end
+
+# test_simple_gaで使う評価関数
+def count_true(ary)
+  sum = 0
+  ary.each do |a|
+    sum += 1 if a == true
+  end
+  return sum
 end
 
 def test_simple_ga
