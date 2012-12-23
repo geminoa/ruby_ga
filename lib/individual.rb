@@ -40,7 +40,7 @@ class Individual
     return @gene.size
   end
 
-  # To avoid original @gene, return duplicated array.
+  # Return duplicated array.
   def gene
     return @gene.dup
   end

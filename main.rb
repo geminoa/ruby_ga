@@ -1,3 +1,6 @@
+#!/usr/bin/env ruby
+# -*- coding: utf-8 -*-
+
 require "ruby_ga"
 require "pp"
 
@@ -50,7 +53,7 @@ def main
   po = Population.new conf
   10000.times do |i|
     po.simple_ga(conf.fitness, conf.selection, conf.mutation)
-    if i%1 == 0
+    if i%100 == 0
       puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
       puts "total_val=#{po.elite_selection(conf.fitness).fitness(conf.fitness)}"
     end
@@ -202,5 +205,5 @@ def test_simple_ga
   end
 end
 
-#test_simple_ga
-main()
+test_simple_ga
+#main()
