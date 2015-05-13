@@ -4,8 +4,8 @@
 $LOAD_PATH << File.expand_path(File.join(".."), File.dirname(__FILE__))
 
 require "rubygems"
-require "rspec/autorun" 
 require "ruby_ga"
+require "utils"
 
 describe Population, "when setup" do
   before do
@@ -28,9 +28,10 @@ describe Population, "when setup" do
     @po = Population.new conf
   end
 
-  it "#units.size should be #{@unit_num}" do
-    @po.units.size.should == @unit_num
-  end
+  #it "units.size should be #{@unit_num}" do
+  it {
+    expect(@po.units.size).to eq(@unit_num)
+  }
 
   after do
     @po = nil

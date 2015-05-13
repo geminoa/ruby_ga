@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
+$:.unshift File.dirname(__FILE__)
 require "ruby_ga"
 require "pp"
 
