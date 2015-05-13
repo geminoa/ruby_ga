@@ -1,1 +1,0 @@
-plot 'evo_rank_inversion.dat' w l, 'evo_rank_translocation.dat' w l, 'evo_rank_move.dat' w l, 'evo_rank_scramble.dat' w l, 'evo_rank_else.dat' w l

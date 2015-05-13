@@ -1,1 +1,0 @@
-plot 'evo_elite_inversion.dat' w l, 'evo_elite_translocation.dat' w l, 'evo_elite_move.dat' w l, 'evo_elite_scramble.dat' w l, 'evo_elite_else.dat' w l
