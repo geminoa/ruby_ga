@@ -1,1 +1,0 @@
-plot 'evo_tournament_inversion.dat' w l, 'evo_tournament_translocation.dat' w l, 'evo_tournament_move.dat' w l, 'evo_tournament_scramble.dat' w l, 'evo_tournament_else.dat' w l

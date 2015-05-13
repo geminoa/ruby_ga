@@ -1,1 +1,0 @@
-plot 'evo_roulette_inversion.dat' w l, 'evo_roulette_translocation.dat' w l, 'evo_roulette_move.dat' w l, 'evo_roulette_scramble.dat' w l, 'evo_roulette_else.dat' w l
