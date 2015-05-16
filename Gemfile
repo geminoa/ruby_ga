@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
-ruby "2.1.2"
 
-gem "test-unit"
+#gem "test-unit"
+gem "rspec"
