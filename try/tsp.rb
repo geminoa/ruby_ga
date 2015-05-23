@@ -6,6 +6,13 @@ require "rubygems"
 require "pp"
 #require "parallel"
 
+$:.unshift(File.dirname(File.expand_path(__FILE__)))
+
+$datdir = File.dirname(File.expand_path(__FILE__)) + "/dat"
+if !Dir.exist?($datdir)
+  Dir.mkdir($datdir)
+end
+  
 # TPSで使う評価関数
 def sum_distances(gene_ary)
   sum = 0.0
@@ -81,7 +88,7 @@ def test_tsp
     if i%10000 == 0
       puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
       #puts "best=#{po.elite_selection(conf.fitness).fitness(conf.fitness)}"
-      open("dat/points#{i}.dat", "w+"){|f|
+      open("#{$datdir}/points#{i}.dat", "w+"){|f|
         best_unit = po.elite_selection(conf.fitness)
         #p best_unit.gene
         best_unit.gene.each do |idx|
@@ -95,7 +102,7 @@ def test_tsp
       gnuplot_str += "pause 1\n"
     end
   end
-  open("dat/plot.gpl", "w+"){|f| f.write(gnuplot_str)}
+  open("#{$datdir}/plot.gpl", "w+"){|f| f.write(gnuplot_str)}
 end
 
 test_tsp()
