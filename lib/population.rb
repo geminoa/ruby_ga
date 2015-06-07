@@ -18,7 +18,51 @@ class Population
     end
   end
 
+  # Evolve population with simple GA.
+  # @params fun [Method] evaluation function.
+  # @params selection [String] selection method.
+  # @params mutation_method [String] mutation method for Individual#mutation.
   def simple_ga(fun, selection=nil, mutation_method=nil)
+    # Crossover
+    new_units = []
+    #if rand(100) > @crossoverProbability*100
+    while (new_units.size < @units.size)
+      #@units.each{|unit| unit.get_older}
+      case selection
+      when "roulette"
+        parent1 = roulette_selection!(fun)
+        parent2 = roulette_selection!(fun)
+      when "elite"
+        parent1 = elite_selection!(fun)
+        parent2 = elite_selection!(fun)
+      when "tournament"
+        parent1 = tournament_selection!(fun)
+        parent2 = tournament_selection!(fun)
+      when "rank" 
+        parent1 = rank_selection!(fun)
+        parent2 = rank_selection!(fun)
+      else
+        raise "selection method is invalid!"
+      end
+      child1, child2 = parent1.crossover(parent2, @crossover)
+      #@units << parent1 << parent2 << child1 << child2 
+      new_units << child1 << child2
+      #2.times do
+      #  worst = drop_worst_unit(fun)
+      #end
+    end
+    
+    # Mutation
+    #@units.each do |unit|
+    new_units.each do |unit|
+      if rand(100) < @mutationProbability*100
+        unit.mutation(@mutationProbability, mutation_method)
+      end
+    end
+    @units = new_units
+  end
+
+  def simple_ga_old(fun, selection=nil, mutation_method=nil)
     # Crossover
     if rand(100) > @crossoverProbability*100
       @units.each{|unit| unit.get_older}
@@ -53,7 +97,7 @@ class Population
     end
   end
 
-  # simple gaの改良版？名前が不明
+  # Experimental
   def modified_ga(fun)
     rank = {}  # key: index of @unit, val: fitness.
     @units.size.times do |i|
