@@ -9,8 +9,9 @@ require "pp"
 $:.unshift(File.dirname(File.expand_path(__FILE__)))
 
 # Configuration.
-point_num = 15
-num_try = 1000 # Number of trial.
+point_num = 25
+interval = 1000
+num_try = 20000 # Number of trial.
 conf = RubyGAConfig.new(
   unit_num=50,
   gene_size=nil,
@@ -48,7 +49,7 @@ def sum_distances(gene_ary)
     sum += dist
     i += 1
   end
-  puts sum
+  #puts sum
 
   return 1.0/sum * 10000
 end
@@ -102,8 +103,8 @@ def main(conf, num_try)
   gnuplot_str = "set xrange [-100:100]\nset yrange[-100:100]\n"
   num_try.times do |i|
     po.simple_ga(conf.fitness, conf.selection, conf.mutation)
-    if i%10000 == 0
-      puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
+    if i % interval == 0
+      #puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
       #puts "best=#{po.elite_selection(conf.fitness).fitness(conf.fitness)}"
       open("#{$datdir}/points#{i}.dat", "w+"){|f|
         best_unit = po.elite_selection(conf.fitness)
