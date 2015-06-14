@@ -30,17 +30,17 @@ class Population
       #@units.each{|unit| unit.get_older}
       case selection
       when "roulette"
-        parent1 = roulette_selection!(fun)
-        parent2 = roulette_selection!(fun)
+        parent1 = roulette_selection(fun)
+        parent2 = roulette_selection(fun)
       when "elite"
-        parent1 = elite_selection!(fun)
-        parent2 = elite_selection!(fun)
+        parent1 = elite_selection(fun)
+        parent2 = elite_selection(fun)
       when "tournament"
-        parent1 = tournament_selection!(fun)
-        parent2 = tournament_selection!(fun)
+        parent1 = tournament_selection(fun)
+        parent2 = tournament_selection(fun)
       when "rank" 
-        parent1 = rank_selection!(fun)
-        parent2 = rank_selection!(fun)
+        parent1 = rank_selection(fun)
+        parent2 = rank_selection(fun)
       else
         raise "selection method is invalid!"
       end

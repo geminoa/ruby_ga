@@ -11,7 +11,7 @@ $:.unshift(File.dirname(File.expand_path(__FILE__)))
 # Configuration.
 point_num = 25
 interval = 1000
-num_try = 20000 # Number of trial.
+num_try = 10000 # Number of trial.
 conf = RubyGAConfig.new(
   unit_num=50,
   gene_size=nil,
@@ -90,7 +90,7 @@ def generate_points(pnum=20, xrange=50, yrange=50, uniq=true)
 end
 
 $points = generate_points(point_num)
-def main(conf, num_try)
+def main(conf, num_try, interval)
   genes = []
   conf.unit_num.times{|i|
     genes << conf.generate_gene(cond="tsp")
@@ -103,6 +103,7 @@ def main(conf, num_try)
   gnuplot_str = "set xrange [-100:100]\nset yrange[-100:100]\n"
   num_try.times do |i|
     po.simple_ga(conf.fitness, conf.selection, conf.mutation)
+    p po.units.size
     if i % interval == 0
       #puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
       #puts "best=#{po.elite_selection(conf.fitness).fitness(conf.fitness)}"
@@ -123,4 +124,4 @@ def main(conf, num_try)
   open("#{$datdir}/plot.gpl", "w+"){|f| f.write(gnuplot_str)}
 end
 
-main(conf, num_try)
+main(conf, num_try, interval)
