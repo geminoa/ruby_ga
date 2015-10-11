@@ -1,13 +1,15 @@
 #!/usr/bin/env ruby
-# -*- coding: utf-8 -*-
+# coding: utf-8
 
 $LOAD_PATH << File.expand_path(File.join(".."), File.dirname(__FILE__))
 
+require "minitest/unit"
+require "minitest/autorun"
 require "rubygems"
 require "ruby_ga"
 
-describe Individual do
-  before do
+class TestPopulation < MiniTest::Unit::TestCase
+  def setup
     @unit_num = 30
     @gene_size = 30
     @conf = RubyGAConfig.new(
@@ -33,32 +35,7 @@ describe Individual do
     )
   end
 
-  describe "When setup" do
-
-    describe "gene_size" do
-      it {
-        expect(@ind.gene_size).to eq(@gene_size)
-      }
-    end
-
-    describe "duplicated gene" do
-      it {
-        expect(@ind.gene).to eq(@conf.genes[0])
-        expect(@ind.gene.__id__).not_to eq(@conf.genes[0].__id__)
-      }
-    end
-  end
-
-  describe "get_older" do
-    it {
-      cur_age = @ind.age
-      @ind.get_older
-      expect(@ind.age).to eq(cur_age + 1)
-    }
-  end
-
-  after do
-    @po = nil
-    @ind = nil
+  def test_unit_size
+    assert_equal @po.units.size, @unit_num
   end
 end
