@@ -3,12 +3,13 @@
 
 $LOAD_PATH << File.expand_path(File.join(".."), File.dirname(__FILE__))
 
-require "minitest/unit"
 require "minitest/autorun"
 require "rubygems"
 require "ruby_ga"
 
-class TestPopulation < MiniTest::Unit::TestCase
+#MiniTest.autorun
+
+class TestPopulation < MiniTest::Test
   def setup
     @unit_num = 30
     @gene_size = 30
