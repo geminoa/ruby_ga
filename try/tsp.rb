@@ -1,12 +1,11 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
-load "ruby_ga.rb"
-require "rubygems"
-require "pp"
-#require "parallel"
-
 $:.unshift(File.dirname(File.expand_path(__FILE__)))
+
+require "ruby_ga"
+require "pp"
+
 
 # Configuration.
 point_num = 25
@@ -103,7 +102,7 @@ def main(conf, num_try, interval)
   gnuplot_str = "set xrange [-100:100]\nset yrange[-100:100]\n"
   num_try.times do |i|
     po.simple_ga(conf.fitness, conf.selection, conf.mutation)
-    p po.units.size
+    #p po.units.size
     if i % interval == 0
       #puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
       #puts "best=#{po.elite_selection(conf.fitness).fitness(conf.fitness)}"
