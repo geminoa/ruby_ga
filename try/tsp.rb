@@ -1,16 +1,15 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
-$:.unshift(File.dirname(File.expand_path(__FILE__)))
+$:.unshift(File.dirname(File.expand_path(__FILE__)) + "/../")
 
 require "ruby_ga"
 require "pp"
 
-
 # Configuration.
-point_num = 25
-interval = 1000
-num_try = 10000 # Number of trial.
+point_num = 30 
+interval = 200
+num_try = 1000 # Number of trial.
 conf = RubyGAConfig.new(
   unit_num=50,
   gene_size=nil,
@@ -22,7 +21,7 @@ conf = RubyGAConfig.new(
   crossover="cut_from_left",
   #crossover="stitch",
   crossoverProbability=0.7,
-  mutationProbability=0.3,
+  mutationProbability=0.4,
   desc="TSP test"
 )
 
@@ -32,7 +31,7 @@ conf = RubyGAConfig.new(
 $points = []
 
 # Setup directory for gnuplot related files.
-$datdir = File.dirname(File.expand_path(__FILE__)) + "/dat"
+$datdir = File.dirname(File.expand_path(__FILE__)) + "/dat/tsp"
 if !Dir.exist?($datdir)
   Dir.mkdir($datdir)
 end
@@ -100,10 +99,11 @@ def main(conf, num_try, interval)
   po = Population.new conf
 
   gnuplot_str = "set xrange [-100:100]\nset yrange[-100:100]\n"
-  num_try.times do |i|
+  num_try.times do |num|
+    i = num + 1
     po.simple_ga(conf.fitness, conf.selection, conf.mutation)
     #p po.units.size
-    if i % interval == 0
+    if (i == 1) or (i % interval == 0)
       #puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
       #puts "best=#{po.elite_selection(conf.fitness).fitness(conf.fitness)}"
       open("#{$datdir}/points#{i}.dat", "w+"){|f|
