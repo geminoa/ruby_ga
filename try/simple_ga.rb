@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 $:.unshift(File.dirname(File.expand_path(__FILE__)) + "/../")
-p File.dirname(File.expand_path(__FILE__)) + "/../"
+
 require "ruby_ga"
 require "pp"
 
@@ -43,7 +43,7 @@ def count_true(ary)
   return sum
 end
 
-def test_simple_ga
+def test_simple_ga(num_try)
   conf = RubyGAConfig.new(
     unit_num=100,
     gene_size=50,
@@ -59,7 +59,7 @@ def test_simple_ga
   )
 
   # Setup directory for gnuplot related files.
-  datdir = File.dirname(File.expand_path(__FILE__)) + "/dat"
+  datdir = File.dirname(File.expand_path(__FILE__)) + "/dat/simple_ga"
   if !Dir.exist?(datdir)
     Dir.mkdir(datdir)
   end
@@ -70,7 +70,7 @@ def test_simple_ga
       po = Population.new conf
       fun = method(:count_true)
       file = open("#{datdir}/evo_#{sel}_#{mut}.dat", "w+")
-      2000.times do |i|
+      num_try.times do |i|
         po.simple_ga(fun, sel, mut)
         #po.modified_ga(fun)
         #puts "fit: " + po.elite_selection(fun).fitness(fun).to_s
@@ -87,7 +87,8 @@ def test_simple_ga
 end
 
 def main
-  test_simple_ga
+  num_try = 1000
+  test_simple_ga(num_try)
 end
 
 main
