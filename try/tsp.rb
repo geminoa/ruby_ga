@@ -18,7 +18,7 @@ conf = RubyGAConfig.new(
   fitness=nil,
   selection="roulette",
   mutation="inversion",
-  crossover="cut_from_left",
+  crossover="uniform",
   #crossover="stitch",
   crossoverProbability=0.7,
   mutationProbability=0.4,
@@ -49,7 +49,7 @@ def sum_distances(gene_ary)
   end
   #puts sum
 
-  return 1.0/sum * 10000
+  return 1.0 / sum * 10000
 end
 
 # Calculate distance between two points in any size of dimension.
@@ -88,6 +88,8 @@ def generate_points(pnum=20, xrange=50, yrange=50, uniq=true)
 end
 
 $points = generate_points(point_num)
+p $points
+
 def main(conf, num_try, interval)
   genes = []
   conf.unit_num.times{|i|
@@ -102,6 +104,9 @@ def main(conf, num_try, interval)
   num_try.times do |num|
     i = num + 1
     po.simple_ga(conf.fitness, conf.selection, conf.mutation)
+
+#    p po.average_fitness(fun)
+
     #p po.units.size
     if (i == 1) or (i % interval == 0)
       #puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"

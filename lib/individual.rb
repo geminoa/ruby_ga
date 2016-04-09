@@ -31,7 +31,6 @@ class Individual
   end
 
   # Change @geneVariation to the var.
-  # 使うかな？
   def change_variation(var)
     @geneVariation = var
   end
@@ -75,15 +74,15 @@ class Individual
       else
         raise "Crossover method is invalid!"
       end
-      child1 = Individual.new(@gene.size,  @gene_var, gene1 , @mutationProbability)
-      child2 = Individual.new(@gene.size,  @gene_var, gene2 , @mutationProbability)
+      child1 = Individual.new(@gene.size, @gene_var, gene1 , @mutationProbability)
+      child2 = Individual.new(@gene.size, @gene_var, gene2 , @mutationProbability)
       return child1, child2
     else
       raise "different spiecies!"
     end
   end
 
-  # Not destructive
+  # No destructive
   # TODO @geneがboolean or Fixnum以外の場合も作成
   def mutation(mutProbability, mutation_method)
     tmp_gene = @gene.dup
@@ -136,6 +135,7 @@ class Individual
     return true
   end
 
+  # Duplicate self object.
   def dup
     return Individual.new(@gene.size,  @gene_var, @gene, @mutationProbability)
   end
@@ -224,7 +224,8 @@ class Individual
   # parent1 [a,b,c,d,e,...]
   # parent2 [A,B,C,D,E,...]
   # n = 2の場合、
-  # child   [a,b,A,B,c,d,...]
+  # child1   [a,b,A,B,c,d,...]
+  # child2   [i,j,I,J,k,l,...]
   #
   # cnum: cut number.
   # dup: allow duplication or not.
@@ -232,29 +233,40 @@ class Individual
     if cnum < 1
       raise 'cnum must be larger than 1.'
     end
+
     ary_size = genes1.size
+    tmp_ary = []
     res_ary = []
-    flg = true
-    2.times do
-      ary1 = genes1.dup
-      ary2 = genes2.dup
-      tmp_ary = []
-      ary_size.times do |i|
-        cnum.times do
-          if flg == true
-            tmp_ary << ary1.shift
-          else
-            tmp_ary << ary2.shift
-          end
-          tmp_ary.uniq!
-          break if tmp_ary.size == ary_size
-        end
-        break if tmp_ary.size == ary_size
-        flg = !flg
+
+    ary1 = genes1.dup
+    ary2 = genes2.dup
+    ary_size.times do |i|
+      cnum.times do |j|
+        tmp_ary << 
       end
-      res_ary << tmp_ary.dup
-      flg = false
     end
+
+    #flg = true
+    #2.times do
+    #  ary1 = genes1.dup
+    #  ary2 = genes2.dup
+    #  tmp_ary = []
+    #  ary_size.times do |i|
+    #    cnum.times do
+    #      if flg == true
+    #        tmp_ary << ary1.shift
+    #      else
+    #        tmp_ary << ary2.shift
+    #      end
+    #      #tmp_ary.uniq!
+    #      break if tmp_ary.size == ary_size
+    #    end
+    #    break if tmp_ary.size == ary_size
+    #    flg = !flg
+    #  end
+    #  res_ary << tmp_ary.dup
+    #  flg = false
+    #end
 
     child1 = res_ary[0]
     child2 = res_ary[1]

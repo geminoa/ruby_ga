@@ -6,33 +6,33 @@ $:.unshift(File.dirname(File.expand_path(__FILE__)) + "/../")
 require "ruby_ga"
 require "pp"
 
-def generate_points(pnum=100, xrange=200, yrange=200, uniq=true)
-  points = []
-  pnum.times do |i|
-    points << [rand(xrange) - xrange/2, rand(yrange) - yrange/2]
-  end
+#def generate_points(pnum=100, xrange=200, yrange=200, uniq=true)
+#  points = []
+#  pnum.times do |i|
+#    points << [rand(xrange) - xrange/2, rand(yrange) - yrange/2]
+#  end
+#
+#  if uniq == true
+#    points = points.uniq
+#    while(points.size < pnum)
+#      points << [rand(xrange) - xrange/2, rand(yrange) - yrange/2]
+#    end
+#  end
+#  return points
+#end
 
-  if uniq == true
-    points = points.uniq
-    while(points.size < pnum)
-      points << [rand(xrange) - xrange/2, rand(yrange) - yrange/2]
-    end
-  end
-  return points
-end
-
-$point_num = 500
-$points = [
-  [0,80],
-  [0,-80],
-  [60,60],
-  [-60,-60],
-  [-60,60],
-  [60,-60],
-  [80,0],
-  [-80,0]
-]
-$points = generate_points($point_num)
+#$point_num = 500
+#$points = [
+#  [0,80],
+#  [0,-80],
+#  [60,60],
+#  [-60,-60],
+#  [-60,60],
+#  [60,-60],
+#  [80,0],
+#  [-80,0]
+#]
+#$points = generate_points($point_num)
 
 # test_simple_gaで使う評価関数
 def count_true(ary)
@@ -55,7 +55,7 @@ def test_simple_ga(num_try)
     crossover=nil,
     crossoverProbability=nil,
     mutationProbability=nil,
-    desc="simple GA(?) test"
+    desc="simple GA test"
   )
 
   # Setup directory for gnuplot related files.

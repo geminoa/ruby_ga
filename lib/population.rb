@@ -42,7 +42,7 @@ class Population
         parent1 = rank_selection(fun)
         parent2 = rank_selection(fun)
       else
-        raise "selection method is invalid!"
+        raise "selection method #{selection} is invalid!"
       end
       child1, child2 = parent1.crossover(parent2, @crossover)
       #@units << parent1 << parent2 << child1 << child2 
@@ -55,7 +55,7 @@ class Population
     # Mutation
     #@units.each do |unit|
     new_units.each do |unit|
-      if rand(100) < @mutationProbability*100
+      if rand(100) < @mutationProbability * 100
         unit.mutation(@mutationProbability, mutation_method)
       end
     end
