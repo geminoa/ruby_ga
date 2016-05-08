@@ -47,6 +47,7 @@ end
 def test_knapsack(num_try, conf)
   po = Population.new conf
   fun = method(:sum_items)
+  conf.fitness = fun
   num_try.times do |i|
     po.simple_ga(fun, conf.selection)
   end
@@ -61,7 +62,8 @@ def main(num_try)
     fitness = nil,
     selection = "roulette",
     mutation = "inversion",
-    crossover = "cut_from_left",
+    crossover = "uniform",
+    #crossover = "stitch",
     crossoverProbability = 0.7,
     mutationProbability = 0.4,
     desc = "knapsack test"

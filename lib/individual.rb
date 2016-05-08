@@ -64,6 +64,7 @@ class Individual
         gene1, gene2 = multi_point_crossover(@gene, pa.gene, crossover_method)
       end
 
+      puts "before gene.size: #{@gene.size}"
       case crossover_method
       when "uniform"
         gene1, gene2 = uniform_crossover(@gene, pa.gene)
@@ -71,9 +72,16 @@ class Individual
         gene1, gene2 = cut_from_left_crossover(@gene, pa.gene)
       when "stitch"
         gene1, gene2 = stitch_crossover(@gene, pa.gene)
+      when "one_point"
+        gene1, gene2 = one_point_crossover(@gene, pa.gene)
+      when "multi_point"
+        gene1, gene2 = multi_point_crossover(@gene, pa.gene)
       else
         raise "Crossover method is invalid!"
       end
+      puts "after gene.size: #{@gene.size}"
+      puts "gene1.size: #{gene1.size}"
+      puts "gene2.size: #{gene2.size}"
       child1 = Individual.new(@gene.size, @gene_var, gene1 , @mutationProbability)
       child2 = Individual.new(@gene.size, @gene_var, gene2 , @mutationProbability)
       return child1, child2
@@ -142,54 +150,63 @@ class Individual
 
   private
   # 50%の確率でparent1 or parent2どちらかの遺伝子を引き継ぐ
-  def uniform_crossover(ary1, ary2)
-    if ary1.size != ary2.size
-      raise "size of ary1,2 must be same."
+  def uniform_crossover(gene1, gene2)
+    if gene1.size != gene2.size
+      raise "size of gene1 and gene2 must be same."
     end
 
-    ary1.size.times do |i|
+    gene1.size.times do |i|
       if rand(2) == 0  # 0 is returned in 50%.
-        tmp = ary1[i]
-        ary1[i] = ary2[i]
-        ary2[i] = tmp
+        tmp = gene1[i]
+        gene1[i] = gene2[i]
+        gene2[i] = tmp
       end
     end
-    return ary1, ary2
+    return gene1, gene2
   end
 
   # 1点交叉
-  def one_point_crossover(ary1, ary2)
-    point = rand(ary1.size)
-    child1 = ary1.slice!(0, point)
-    child2 = ary2.slice!(0, point)
-    child1 += ary2
-    child2 += ary1
+  def one_point_crossover(gene1, gene2)
+    # Duplicate gene1 and gene2 to avoid destructed by slice! method.
+    tmp1 = gene1.dup
+    tmp2 = gene2.dup
+
+    point = rand(tmp1.size - 2) + 1  # except first and last one.
+    child1 = tmp1.slice!(0, point)
+    child2 = tmp2.slice!(0, point)
+    child1 += tmp2
+    child2 += tmp1
     return child1, child2
   end
 
   # 複数点交叉
-  def multi_point_crossover(ary1, ary2, po_num)
-    if po_num == 0 || po_num == 1
-      one_point_crossover(ary1, ary2)
+  def multi_point_crossover(gene1, gene2, po_num=2)
+    if po_num == 0 
+      raise "You must give 1 or more value for po_num."
+    elsif po_num == 1
+      return one_point_crossover(gene1, gene2)
+    elsif po_num == (tmp1.size - 1) # same as stitch_crossover with cnum=1.
+      return stitch_crossover(gene1, gene2, 1)
     else
-      if po_num > ary1.size
-        raise "too many point number! po_num must be lesser than ary size."
+      if po_num >= gene1.size
+        raise "Too many points! po_num must be less than gene size."
       end
 
-      # Select the points for crossover.
+      # Decide which positions for crossover in random.
       points = []
-      if po_num == ary1.size
-        po_num.times do |i|
-          points << i
-        end
+        
       else
-        po_num.times do |i|
-          points << rand(ary1.size)
-        end
+        # Duplicate gene1 and gene2 to avoid destructed by slice! method.
+        tmp1 = gene1.dup
+        tmp2 = gene2.dup
+
+        #po_num.times do |i|
+        #  points << rand(gene1.size)
+        #end
         points.uniq!
 
         while(points.size < po_num)
-          points << rand(ary1.size)
+          points << rand(gene1.size)
           points.uniq!
         end
       end
@@ -201,17 +218,17 @@ class Individual
       switch = true
       points.size.time do |pi|
         if points[pi+1] == nil
-          next_index = ary1.size - 1
+          next_index = gene1.size - 1
         else
           next_index = points[pi+1]
         end
 
         if switch == true
-          child1 += ary1.slice(pi, next_index - pi)
-          child2 += ary2.slice(pi, next_index - pi)
+          child1 += gene1.slice(pi, next_index - pi)
+          child2 += gene2.slice(pi, next_index - pi)
         else
-          child1 += ary2.slice(pi, next_index - pi)
-          child2 += ary1.slice(pi, next_index - pi)
+          child1 += gene2.slice(pi, next_index - pi)
+          child2 += gene1.slice(pi, next_index - pi)
         end
         switch = !switch
       end
@@ -221,6 +238,7 @@ class Individual
   end
 
   # 両親それぞれ左からn個ずつ遺伝子をとっていく
+  # cnumは遺伝子サイズの半分以下出なければならない
   # parent1 [a,b,c,d,e,...]
   # parent2 [A,B,C,D,E,...]
   # n = 2の場合、
@@ -230,46 +248,28 @@ class Individual
   # cnum: cut number.
   # dup: allow duplication or not.
   def cut_from_left_crossover(genes1, genes2, cnum=2)
-    if cnum < 1
-      raise 'cnum must be larger than 1.'
+    if cnum > genes1.size/2
+      raise 'cnum must be lower than half of gene size.'
     end
-
-    ary_size = genes1.size
-    tmp_ary = []
-    res_ary = []
-
+    
+    # Duplicate pa1 and pa2 to avoid destructed by slice! method.
     ary1 = genes1.dup
     ary2 = genes2.dup
-    ary_size.times do |i|
-      cnum.times do |j|
-        tmp_ary << 
+    tmp_container = []  # contains all cut genes. separated to child1 and 2.
+    flg = true
+    while ary2.size > 0
+      if flg == true
+        tmp_container << ary1.slice!(0, cnum)
+        flg = !flg
+      else
+        tmp_container << ary2.slice!(0, cnum)
+        flg = !flg
       end
     end
 
-    #flg = true
-    #2.times do
-    #  ary1 = genes1.dup
-    #  ary2 = genes2.dup
-    #  tmp_ary = []
-    #  ary_size.times do |i|
-    #    cnum.times do
-    #      if flg == true
-    #        tmp_ary << ary1.shift
-    #      else
-    #        tmp_ary << ary2.shift
-    #      end
-    #      #tmp_ary.uniq!
-    #      break if tmp_ary.size == ary_size
-    #    end
-    #    break if tmp_ary.size == ary_size
-    #    flg = !flg
-    #  end
-    #  res_ary << tmp_ary.dup
-    #  flg = false
-    #end
-
-    child1 = res_ary[0]
-    child2 = res_ary[1]
+    tmp_container.flatten!
+    child1 = tmp_container.slice!(0, tmp_container.size/2)
+    child2 = tmp_container
     return child1, child2
   end
 
