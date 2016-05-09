@@ -181,58 +181,50 @@ class Individual
 
   # 複数点交叉
   def multi_point_crossover(gene1, gene2, po_num=2)
+    # [TODO] Replace if statement to case stat.
     if po_num == 0 
       raise "You must give 1 or more value for po_num."
     elsif po_num == 1
       return one_point_crossover(gene1, gene2)
-    elsif po_num == (tmp1.size - 1) # same as stitch_crossover with cnum=1.
+    elsif po_num == (gene1.size - 1) # same as stitch_crossover with cnum=1.
       return stitch_crossover(gene1, gene2, 1)
-    else
-      if po_num >= gene1.size
-        raise "Too many points! po_num must be less than gene size."
-      end
-
-      # Decide which positions for crossover in random.
+    elsif po_num >= gene1.size 
+      raise "Too many points! po_num must be less than gene size."
+    else # Decide which positions for crossover in random.
       points = []
-        
-      else
-        # Duplicate gene1 and gene2 to avoid destructed by slice! method.
-        tmp1 = gene1.dup
-        tmp2 = gene2.dup
+      # Duplicate gene1 and gene2 to avoid destructed by slice! method.
+      # [memo] It doesn't need if there is no destructive methods for gene1, 2.
+      tmp1 = gene1.dup
+      tmp2 = gene2.dup
 
-        #po_num.times do |i|
-        #  points << rand(gene1.size)
-        #end
-        points.uniq!
-
-        while(points.size < po_num)
-          points << rand(gene1.size)
-          points.uniq!
-        end
+      # Decide multi points in random.
+      tmp_p = (1..tmp1.size).to_a
+      while points.size < po_num
+        points << tmp_p.delete_at(rand(tmp_p.size))
       end
       points.sort!
-      points = [0] + points if points[0] != 0
 
       child1 = []
       child2 = []
-      switch = true
-      points.size.time do |pi|
-        if points[pi+1] == nil
-          next_index = gene1.size - 1
+      flg = true
+      # Add 0 to head and points.size to tails for using them as index of slice.
+      # [TODO] sliceの使い方が間違っている！修正！
+      points.unshift 0
+      points.push tmp1.size
+      p points # debug
+      (points.size - 1).times do |idx|
+        p_from = points[idx]
+        p_to = points[idx+1] - 1
+        puts "from:#{p_from}, to:#{p_to}"  # debug
+        if flg == true
+          child1 += tmp1.slice(p_from, p_to)
+          child2 += tmp2.slice(p_from, p_to)
         else
-          next_index = points[pi+1]
+          child1 += tmp2.slice(p_from, p_to)
+          child2 += tmp1.slice(p_from, p_to)
         end
-
-        if switch == true
-          child1 += gene1.slice(pi, next_index - pi)
-          child2 += gene2.slice(pi, next_index - pi)
-        else
-          child1 += gene2.slice(pi, next_index - pi)
-          child2 += gene1.slice(pi, next_index - pi)
-        end
-        switch = !switch
+        flg = !flg
       end
-
       return child1, child2
     end
   end

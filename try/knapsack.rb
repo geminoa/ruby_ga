@@ -39,7 +39,7 @@ def sum_items(gene_ary)
   if total_weight > max_weight
     total_val = penalty
   end
-  puts "w: #{total_weight}; v: #{total_val}"
+  puts "#{total_weight} #{total_val}"
   return total_val
 end
 
@@ -62,15 +62,17 @@ def main(num_try)
     fitness = nil,
     selection = "roulette",
     mutation = "inversion",
-    crossover = "uniform",
+    #crossover = "uniform",
     #crossover = "stitch",
+    #crossover = "one_point",
+    crossover = "multi_point",
     crossoverProbability = 0.7,
-    mutationProbability = 0.4,
+    mutationProbability = 0.2,
     desc = "knapsack test"
   )
 
   test_knapsack(num_try, conf)
-  puts "done"
+  #puts "done"
 end
 
 main(num_try)
