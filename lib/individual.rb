@@ -10,18 +10,18 @@ class Individual
   #    [exp] If you give the variation as 3, the bits of the gene is value of 0 ~ 2
   #          like following array, [1, 0, 2, 1, 1, 2, 0 ...].
   # 3. Array of arbitrary value (You give the array directly)
-  def initialize(gene_size, gene_var, genes, mutationProbability)
+  def initialize(gene_size, gene_var, gene, mutationProbability)
     @age = 0
     @gene_var = gene_var.dup
     @gene = []
 
-    if genes == nil
+    if gene == nil
       gene_size.times do |i|
         @gene << gene_var[rand(gene_var.size)]
       end
     else  # case of gen != nil
-      if genes.class == Array  # Gene is the array of arbitrary value.
-        @gene = genes.dup
+      if gene.class == Array  # Gene is the array of arbitrary value.
+        @gene = gene.dup
       else  # Other types of gene is not supported, so gene is set up as default.
         gene_size.times do
           @gene << gene_var[rand(gene_var.size)]
@@ -30,28 +30,34 @@ class Individual
     end
   end
 
+
   # Change @geneVariation to the var.
   def change_variation(var)
     @geneVariation = var
   end
 
+
   def gene_size
     return @gene.size
   end
+
 
   # Return duplicated array.
   def gene
     return @gene.dup
   end
 
+
   def fitness(fun)
     return fun.call(@gene)
   end
+
 
   # Increment age.
   def get_older
     @age += 1
   end
+
 
   # Generate new generation individual.
   def crossover(pa, crossover_method, opt=nil)
@@ -64,7 +70,7 @@ class Individual
         gene1, gene2 = multi_point_crossover(@gene, pa.gene, crossover_method)
       end
 
-      puts "before gene.size: #{@gene.size}"
+      #puts "before gene.size: #{@gene.size}"  # debug
       case crossover_method
       when "uniform"
         gene1, gene2 = uniform_crossover(@gene, pa.gene)
@@ -79,9 +85,9 @@ class Individual
       else
         raise "Crossover method is invalid!"
       end
-      puts "after gene.size: #{@gene.size}"
-      puts "gene1.size: #{gene1.size}"
-      puts "gene2.size: #{gene2.size}"
+      #puts "after gene.size: #{@gene.size}"  # debug
+      #puts "gene1.size: #{gene1.size}"  # debug
+      #puts "gene2.size: #{gene2.size}"  # debug
       child1 = Individual.new(@gene.size, @gene_var, gene1 , @mutationProbability)
       child2 = Individual.new(@gene.size, @gene_var, gene2 , @mutationProbability)
       return child1, child2
@@ -89,6 +95,7 @@ class Individual
       raise "different spiecies!"
     end
   end
+
 
   # No destructive
   # TODO @geneがboolean or Fixnum以外の場合も作成
@@ -117,6 +124,7 @@ class Individual
     return tmp_gene
   end
 
+
   # Destructive
   # TODO @geneがboolean or Fixnum以外の場合も作成
   def mutation!(mutProbability, mutation_method)
@@ -143,10 +151,12 @@ class Individual
     return true
   end
 
+
   # Duplicate self object.
   def dup
     return Individual.new(@gene.size,  @gene_var, @gene, @mutationProbability)
   end
+
 
   private
   # 50%の確率でparent1 or parent2どちらかの遺伝子を引き継ぐ
@@ -165,7 +175,8 @@ class Individual
     return gene1, gene2
   end
 
-  # 1点交叉
+
+  # One point crossover
   def one_point_crossover(gene1, gene2)
     # Duplicate gene1 and gene2 to avoid destructed by slice! method.
     tmp1 = gene1.dup
@@ -179,27 +190,31 @@ class Individual
     return child1, child2
   end
 
-  # 複数点交叉
+
+  # Multi point crossover
   def multi_point_crossover(gene1, gene2, po_num=2)
     # [TODO] Replace if statement to case stat.
-    if po_num == 0 
+    case po_num
+    when 0
       raise "You must give 1 or more value for po_num."
-    elsif po_num == 1
+    when 1
       return one_point_crossover(gene1, gene2)
-    elsif po_num == (gene1.size - 1) # same as stitch_crossover with cnum=1.
+    when (gene1.size - 1) # same as stitch_crossover with cnum=1.
       return stitch_crossover(gene1, gene2, 1)
-    elsif po_num >= gene1.size 
-      raise "Too many points! po_num must be less than gene size."
     else # Decide which positions for crossover in random.
+      if po_num >= gene1.size
+        raise "Too many points! po_num must be less than gene size."
+      end
+
       points = []
       # Duplicate gene1 and gene2 to avoid destructed by slice! method.
       # [memo] It doesn't need if there is no destructive methods for gene1, 2.
       tmp1 = gene1.dup
       tmp2 = gene2.dup
 
-      # Decide multi points in random.
+      # points in random.
       tmp_p = (1..tmp1.size).to_a
-      while points.size < po_num
+      while (points.size < po_num)
         points << tmp_p.delete_at(rand(tmp_p.size))
       end
       points.sort!
@@ -208,20 +223,19 @@ class Individual
       child2 = []
       flg = true
       # Add 0 to head and points.size to tails for using them as index of slice.
-      # [TODO] sliceの使い方が間違っている！修正！
       points.unshift 0
       points.push tmp1.size
-      p points # debug
+      #p points # debug
       (points.size - 1).times do |idx|
         p_from = points[idx]
-        p_to = points[idx+1] - 1
-        puts "from:#{p_from}, to:#{p_to}"  # debug
+        nof_p= points[idx+1] - points[idx] # num of points to slice
+        #puts "from:#{p_from}, num of p:#{nof_p}"  # debug
         if flg == true
-          child1 += tmp1.slice(p_from, p_to)
-          child2 += tmp2.slice(p_from, p_to)
+          child1 += tmp1.slice(p_from, nof_p)
+          child2 += tmp2.slice(p_from, nof_p)
         else
-          child1 += tmp2.slice(p_from, p_to)
-          child2 += tmp1.slice(p_from, p_to)
+          child1 += tmp2.slice(p_from, nof_p)
+          child2 += tmp1.slice(p_from, nof_p)
         end
         flg = !flg
       end
@@ -239,17 +253,17 @@ class Individual
   #
   # cnum: cut number.
   # dup: allow duplication or not.
-  def cut_from_left_crossover(genes1, genes2, cnum=2)
-    if cnum > genes1.size/2
+  def cut_from_left_crossover(gene1, gene2, cnum=2)
+    if cnum > gene1.size/2
       raise 'cnum must be lower than half of gene size.'
     end
     
     # Duplicate pa1 and pa2 to avoid destructed by slice! method.
-    ary1 = genes1.dup
-    ary2 = genes2.dup
-    tmp_container = []  # contains all cut genes. separated to child1 and 2.
+    ary1 = gene1.dup
+    ary2 = gene2.dup
+    tmp_container = []  # contains all cut gene. separated to child1 and 2.
     flg = true
-    while ary2.size > 0
+    while (ary2.size > 0)
       if flg == true
         tmp_container << ary1.slice!(0, cnum)
         flg = !flg
@@ -273,44 +287,29 @@ class Individual
   #
   # cnum: cut number.
   # dup: allow duplication or not.
-  def stitch_crossover(genes1, genes2, cnum=2)
+  def stitch_crossover(gene1, gene2, cnum=2)
     if cnum < 1
       raise 'cnum must be larger than 1.'
     end
-    ary_size = genes1.size
-    res_ary = []
-    cnt = 0
-    2.times do  # child1, 2で２回
-      tmp_ary = []  # genes1, 2の遺伝子をcnumずつtmp_aryに入れていく
-      2.times do |turn|
-        switch = true
-        ary_size.times do |i|
-          if turn == 0  # genes1からtmp_aryに入れていく
-            if switch == true
-              tmp_ary << genes1[i]
-            else
-              tmp_ary << genes2[i]
-            end
-          else  # genes2からtmp_aryに入れていく
-            if switch == false
-              tmp_ary << genes1[i]
-            else
-              tmp_ary << genes2[i]
-            end
-          end
-          cnt += 1
-          if cnt == cnum  # cnum個を格納したらswitchを切り替える
-            switch = !switch
-            cnt = 0
-          end
-        end
+
+    tmp1 = gene1.dup
+    tmp2 = gene2.dup
+    child1 = []
+    child2 = []
+    flg = true
+    while (tmp1.size > 0)
+      if flg
+        child1 = child1 + tmp1.slice!(0, 2)
+        child2 = child2 + tmp2.slice!(0, 2)
+      else
+        child1 = child1 + tmp2.slice!(0, 2)
+        child2 = child2 + tmp1.slice!(0, 2)
       end
-      res_ary << tmp_ary.uniq.slice(0, ary_size) # tmp_aryからary_size個だけ取り出す
+      flg = !flg
     end
-    child1 = res_ary[0]
-    child2 = res_ary[1]
     return child1, child2
   end
+
 
   # Each bit of first parent is checked with bit of second parent whether they are same.
   # If same then the bit is taken for the offspring otherwise the bit from the third parent
@@ -327,13 +326,14 @@ class Individual
     return tmp_ary
   end
 
-  # Invert genes between the two indices.
+
+  # Invert gene between the two indices.
   # For example, if ary = [0,1,2,3,4,5] and indices are 2 and 4
   # then the inversion result is [0,1,4,3,2,5].
   def mutation_inversion(gene_ary)
     idx1 = rand(gene_ary.size)
     idx2 = idx1 
-    while(idx1 == idx2)
+    while (idx1 == idx2)
       idx2 = rand(gene_ary.size)
     end
     if idx1 > idx2
@@ -351,15 +351,15 @@ class Individual
   def mutation_translocation(gene_ary)
     idx1 = rand(gene_ary.size)
     idx2 = idx1
-    while(idx1 == idx2)
+    while (idx1 == idx2)
       idx2 = rand(gene_ary.size)
     end
     idx3 = idx2
-    while(idx1 == idx3 || idx2 == idx3)
+    while (idx1 == idx3 || idx2 == idx3)
       idx3 = rand(gene_ary.size)
     end
     idx4 = idx3
-    while(idx1 == idx4 || idx2 == idx4 ||idx3 == idx4)
+    while (idx1 == idx4 || idx2 == idx4 ||idx3 == idx4)
       idx4 = rand(gene_ary.size)
     end
     # swap idx1 and idx3.
@@ -379,7 +379,7 @@ class Individual
   def mutation_move(gene_ary)
     idx1 = rand(gene_ary.size)
     idx2 = idx1 
-    while(idx1 == idx2)
+    while (idx1 == idx2)
       idx2 = rand(gene_ary.size)
     end
     tmp = gene_ary.slice!(idx2)
@@ -387,11 +387,11 @@ class Individual
     return gene_ary
   end
 
-  # Shuffle genes between the two indices.
+  # Shuffle gene between the two indices.
   def mutation_scramble(gene_ary)
     idx1 = rand(gene_ary.size)
     idx2 = idx1 
-    while(idx1 == idx2)
+    while (idx1 == idx2)
       idx2 = rand(gene_ary.size)
     end
     if idx1 > idx2 # sort indicis.
