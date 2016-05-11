@@ -63,9 +63,9 @@ def main(num_try)
     selection = "roulette",
     mutation = "inversion",
     #crossover = "uniform",
-    #crossover = "stitch",
+    crossover = "stitch",
     #crossover = "one_point",
-    crossover = "multi_point",
+    #crossover = "multi_point",
     crossoverProbability = 0.7,
     mutationProbability = 0.2,
     desc = "knapsack test"
