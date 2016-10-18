@@ -7,9 +7,9 @@ require "ruby_ga"
 require "pp"
 
 # Configuration
-
 num_try = 30
 
+# [weight, val]
 $item_set = [
   [2,21], [10,22], [7,28], [2,21], [4,12],
   [9,24], [10,15], [7,2], [8,25], [5,28],  # 10
@@ -23,6 +23,9 @@ $item_set = [
   [3,40],[9,33],[7,35],[7,21],[9,20]  # 50
 ]
 
+# Gobal variables
+$cnt = 0
+$plot_interval = 50
 
 # ナップサック問題で使う評価関数
 def sum_items(gene_ary)
@@ -39,7 +42,12 @@ def sum_items(gene_ary)
   if total_weight > max_weight
     total_val = penalty
   end
-  puts "#{total_weight} #{total_val}"
+
+  if $cnt % $plot_interval == 0
+    puts "weight: #{total_weight}, val: #{total_val}"
+    #puts "#{$cnt} #{total_weight} #{total_val}"
+  end
+  $cnt += 1
   return total_val
 end
 
