@@ -82,6 +82,14 @@ class Individual
         gene1, gene2 = one_point_crossover(@gene, pa.gene)
       when "multi_point"
         gene1, gene2 = multi_point_crossover(@gene, pa.gene)
+      when "cycle"  # for TSP
+        gene1, gene2 = cycle_crossover(@gene, pa.gene)
+      when "partially_mapped"  # for TSP
+        gene1, gene2 = partially_mapped_crossover(@gene, pa.gene)
+      when "non_wrapping_ordered"  # for TSP
+        gene1, gene2 = non_wrapping_ordered_crossover(@gene, pa.gene)
+      when "ordered"  # for TSP
+        gene1, gene2 = ordered_crossover(@gene, pa.gene)
       else
         raise "Crossover method is invalid!"
       end
@@ -110,6 +118,8 @@ class Individual
       tmp_gene = mutation_move(tmp_gene)
     when "scramble"
       tmp_gene = mutation_scramble(tmp_gene)
+    when "reverse_sequence"  # for TSP
+      tmp_gene = mutation_reverse_sequence(tmp_gene)
     else # Examine each bit of gene whether it's changed or not.
       tmp_gene.size.times do |i|
         if rand(100) < (mutProbability*100)
@@ -137,6 +147,8 @@ class Individual
       mutation_move(@gene)
     when "scramble"
       mutation_scramble(@gene)
+    when "reverse_sequence"  # for TSP
+      mutation_reverse_sequence(@gene)
     else  # Examine each bit of gene whether it's changed or not.
       @gene.size.times do |i|
         if rand(100) < (mutProbability*100)
@@ -193,7 +205,6 @@ class Individual
 
   # Multi point crossover
   def multi_point_crossover(gene1, gene2, po_num=2)
-    # [TODO] Replace if statement to case stat.
     case po_num
     when 0
       raise "You must give 1 or more value for po_num."
@@ -327,6 +338,34 @@ class Individual
   end
 
 
+  # [TODO]
+  def cycle_crossover(gene1, gene2)  # for TSP
+    child1, child2 = nil, nil
+    return child1, child2
+  end
+
+
+  # [TODO]
+  def partially_mapped_crossover(gene1, gene2)  # for TSP
+    child1, child2 = nil, nil
+    return child1, child2
+  end
+
+
+  # [TODO]
+  def non_wrapping_ordered_crossover(gene1, gene2)  # for TSP
+    child1, child2 = nil, nil
+    return child1, child2
+  end
+
+
+  # [TODO]
+  def ordered_crossover(gene1, gene2)  # for TSP
+    child1, child2 = nil, nil
+    return child1, child2
+  end
+
+
   # Invert gene between the two indices.
   # For example, if ary = [0,1,2,3,4,5] and indices are 2 and 4
   # then the inversion result is [0,1,4,3,2,5].
@@ -347,6 +386,7 @@ class Individual
 
     return gene_ary
   end
+
 
   def mutation_translocation(gene_ary)
     idx1 = rand(gene_ary.size)
@@ -376,6 +416,7 @@ class Individual
     return gene_ary
   end
 
+
   def mutation_move(gene_ary)
     idx1 = rand(gene_ary.size)
     idx2 = idx1 
@@ -386,6 +427,7 @@ class Individual
     gene_ary.insert(idx1, tmp)
     return gene_ary
   end
+
 
   # Shuffle gene between the two indices.
   def mutation_scramble(gene_ary)
@@ -402,6 +444,12 @@ class Individual
     tmp = gene_ary.slice!(idx1, (idx2 - idx1 + 1))
     tmp.shuffle!
     gene_ary.insert(idx1,tmp).flatten!
+    return gene_ary
+  end
+
+
+  # [TODO]
+  def mutation_reverse_sequence(gene_ary)
     return gene_ary
   end
 end

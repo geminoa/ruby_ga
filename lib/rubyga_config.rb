@@ -8,6 +8,8 @@ class RubyGAConfig
   $defaultCrossoverProbability = 0.8
   $defaultMutationProbability = 0.05 
 
+  # [TODO] TSPであるかどうかをconfに登録するかどうか考える
+
   attr_accessor :unit_num, :gene_size, :gene_var, :genes, :fitness, :selection, :mutation, :crossover, :crossoverProbability, :mutationProbability, :desc
   def initialize(
     unit_num=nil,   # Number of unit (or individual) of the population.
