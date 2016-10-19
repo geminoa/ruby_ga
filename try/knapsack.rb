@@ -12,7 +12,7 @@ $num_try = 500
 $max_weight = 150
 $penalty = 50
 $plot_interval = 1
-$output_dir = "dat/knapsack"
+$output_dir = File.dirname(File.expand_path(__FILE__)) + "/dat/knapsack"
 $output_file = "knapsack.dat"
 
 # [weight, val]

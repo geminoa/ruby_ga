@@ -382,7 +382,7 @@ class Individual
 
 
   # [TODO]
-  def partially_mapped_crossover(gene1, gene2)  # for TSP
+  def partially_mapped_crossover(gene1, gene2, po_num=1)  # for TSP
     child1, child2 = nil, nil
     return child1, child2
   end

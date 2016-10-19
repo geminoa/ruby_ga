@@ -4,8 +4,10 @@
 $:.unshift(File.dirname(File.expand_path(__FILE__)) + "/../")
 
 require "ruby_ga"
+require "fileutils"
 require "pp"
 
+$datdir = File.dirname(File.expand_path(__FILE__)) + "/dat/simple_ga"
 
 # test_simple_gaで使う評価関数
 def count_true(ary)
@@ -33,9 +35,8 @@ def test_simple_ga(num_try)
   )
 
   # Setup directory for gnuplot related files.
-  datdir = File.dirname(File.expand_path(__FILE__)) + "/dat/simple_ga"
-  if !Dir.exist?(datdir)
-    Dir.mkdir(datdir)
+  if !Dir.exist?($datdir)
+    FileUtils.mkdir_p($datdir)
   end
 
   ["roulette", "elite", "tournament", "rank"].each do |sel|
@@ -43,7 +44,7 @@ def test_simple_ga(num_try)
     ["inversion", "translocation", "move", "scramble", "else"].each do |mut|
       po = Population.new conf
       fun = method(:count_true)
-      file = open("#{datdir}/evo_#{sel}_#{mut}.dat", "w+")
+      file = open("#{$datdir}/evo_#{sel}_#{mut}.dat", "w+")
       num_try.times do |i|
         po.simple_ga(fun, sel, mut)
         #po.modified_ga(fun)
@@ -51,12 +52,12 @@ def test_simple_ga(num_try)
         file.write("#{i} #{po.average_fitness(fun)}\n")
       end
       file.close
-      gpl_cmd += " 'evo_#{sel}_#{mut}.dat' w l,"
+      gpl_cmd += " '#{$datdir}/evo_#{sel}_#{mut}.dat' w l,"
 
       puts "selection=#{sel}, mutation=#{mut}, avg=#{po.average_fitness(fun)}, dev=#{po.deviation_fitness(fun)}"
     end
     gpl_cmd.chop!
-    open("#{datdir}/#{sel}.gpl", "w+") {|f| f.write(gpl_cmd)}
+    open("#{$datdir}/#{sel}.gpl", "w+") {|f| f.write(gpl_cmd)}
   end
 end
 
