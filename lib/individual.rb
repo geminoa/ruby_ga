@@ -174,17 +174,19 @@ class Individual
   # Children are inherit each of elements of gene from parent1, 2 in 50%.
   def uniform_crossover(gene1, gene2)
     if gene1.size != gene2.size
-      raise "size of gene1 and gene2 must be same."
+      raise "Different gene size."
     end
 
-    gene1.size.times do |i|
+    tmp1 = gene1.dup
+    tmp2 = gene2.dup
+    tmp1.size.times do |i|
       if rand(2) == 0  # 0 is returned in 50%.
-        tmp = gene1[i]
-        gene1[i] = gene2[i]
-        gene2[i] = tmp
+        tmp = tmp1[i]
+        tmp1[i] = tmp2[i]
+        tmp2[i] = tmp
       end
     end
-    return gene1, gene2
+    return tmp1, tmp2
   end
 
 
