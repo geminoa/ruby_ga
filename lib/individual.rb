@@ -171,7 +171,7 @@ class Individual
 
 
   private
-  # 50%の確率でparent1 or parent2どちらかの遺伝子を引き継ぐ
+  # Children are inherit each of elements of gene from parent1, 2 in 50%.
   def uniform_crossover(gene1, gene2)
     if gene1.size != gene2.size
       raise "size of gene1 and gene2 must be same."
@@ -204,6 +204,7 @@ class Individual
 
 
   # Multi point crossover
+  # gene is divided by points of the number of po_num.
   def multi_point_crossover(gene1, gene2, po_num=2)
     case po_num
     when 0
@@ -338,10 +339,43 @@ class Individual
   end
 
 
-  # [TODO]
+  # Cycle Crossover for TSP
+  # parent1 = [8, 4, 7, 3, 6, 2, 5, 1, 9, 0]
+  # parent2 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  # 
+  # child1 = [8, 1, 2, 3, 4, 5, 6, 7, 9, 0]
+  # child2 = [0, 4, 7, 3, 6, 2, 5, 1, 8, 9]
   def cycle_crossover(gene1, gene2)  # for TSP
-    child1, child2 = nil, nil
-    return child1, child2
+    if gene1.size != gene2.size
+      raise "Different gene type!"
+    end
+
+    idx_ary = [0]
+    p2_n = gene2[0]
+
+    until (idx_ary.size > 1) and (idx_ary[0] == idx_ary[-1])
+      idx_ary << gene1.find_index(p2_n)
+      p2_n = gene2[gene1.find_index(p2_n)]
+    end
+    idx_ary.pop  # remove nouse last index which is same sa first.
+    p idx_ary
+
+    ary =  Array.new(gene1.size)  # ary = [nil, nil, ..., nil]
+    idx_ary.each do |idx|
+      ary[idx] = true
+    end
+
+    ch1, ch2 = [], []
+    ary.each.with_index do |a, i|
+      if a == true
+        ch1[i] = gene1[i]
+        ch2[i] = gene2[i]
+      else
+        ch1[i] = gene2[i]
+        ch2[i] = gene1[i]
+      end
+    end
+    return ch1, ch2
   end
 
 
