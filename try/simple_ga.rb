@@ -40,7 +40,8 @@ def test_simple_ga(num_try)
   end
 
   ["roulette", "elite", "tournament", "rank"].each do |sel|
-    gpl_cmd = "plot"
+    gpl_cmd = ""
+    cnt = 0
     ["inversion", "translocation", "move", "scramble", "else"].each do |mut|
       po = Population.new conf
       fun = method(:count_true)
@@ -52,9 +53,17 @@ def test_simple_ga(num_try)
         file.write("#{i} #{po.average_fitness(fun)}\n")
       end
       file.close
-      gpl_cmd += " '#{$datdir}/evo_#{sel}_#{mut}.dat' w l,"
+
+      if cnt == 0
+        gpl_cmd = "plot "
+      else
+        gpl_cmd = "replot "
+      end
+      gpl_cmd += "'#{$datdir}/evo_#{sel}_#{mut}.dat' w l, "
+      gpl_cmd += "title '#{sel} #{mut}'\n"
 
       puts "selection=#{sel}, mutation=#{mut}, avg=#{po.average_fitness(fun)}, dev=#{po.deviation_fitness(fun)}"
+      cnt += 1
     end
     gpl_cmd.chop!
     open("#{$datdir}/#{sel}.gpl", "w+") {|f| f.write(gpl_cmd)}
