@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require "pp"
+
 def uniform_crossover(gene1, gene2)
   if gene1.size != gene2.size
     raise "size of gene1 and gene2 must be same."
@@ -178,6 +180,21 @@ pmx_parents = [
   [5, 4, 6, 7, 2, 1, 3]
 ]
 
-#p uniform_crossover(cx_parents[0], cx_parents[1])
-#p cycle_crossover(cx_parents[0], cx_parents[1])
-p partially_mapped_crossover(pmx_parents[0], pmx_parents[1], po_num=2, p1=2, p2=6)
+char_list = ["a","b","c","d","e","f","g"]
+coor_list = [[2,1],[1,2],[0,3],[4,4],[3,5],[2,6],[0,7]]
+pmx_parents2 = []
+pmx_parents.each do |pmxp|
+  tmpary = []
+  pmxp.each do |i|
+    #tmpary << char_list[i-1]
+    tmpary << coor_list[i-1]
+  end
+  pmx_parents2 << tmpary
+end
+pp pmx_parents2
+
+#pp uniform_crossover(cx_parents[0], cx_parents[1])
+#pp cycle_crossover(cx_parents[0], cx_parents[1])
+
+#pp partially_mapped_crossover(pmx_parents[0], pmx_parents[1], po_num=2, p1=2, p2=6)
+pp partially_mapped_crossover(pmx_parents2[0], pmx_parents2[1], po_num=2, p1=2, p2=6)
