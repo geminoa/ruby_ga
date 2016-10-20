@@ -111,15 +111,15 @@ class Individual
     tmp_gene = @gene.dup
     case mutation_method
     when "inversion"
-      tmp_gene = mutation_inversion(tmp_gene)
+      tmp_gene = inversion_mutation(tmp_gene)
     when "translocation"
-      tmp_gene = mutation_translocation(tmp_gene)
+      tmp_gene = translocation_mutation(tmp_gene)
     when "move"
-      tmp_gene = mutation_move(tmp_gene)
+      tmp_gene = move_mutation(tmp_gene)
     when "scramble"
-      tmp_gene = mutation_scramble(tmp_gene)
+      tmp_gene = scramble_mutation(tmp_gene)
     when "reverse_sequence"  # for TSP
-      tmp_gene = mutation_reverse_sequence(tmp_gene)
+      tmp_gene = reverse_sequence_mutation(tmp_gene)
     else # Examine each bit of gene whether it's changed or not.
       tmp_gene.size.times do |i|
         if rand(100) < (mutProbability*100)
@@ -140,15 +140,15 @@ class Individual
   def mutation!(mutProbability, mutation_method)
     case mutation_method
     when "inversion"
-      mutation_inversion(@gene)
+      inversion_mutation(@gene)
     when "translocation"
-      mutation_translocation(@gene)
+      translocation_mutation(@gene)
     when "move"
-      mutation_move(@gene)
+      move_mutation(@gene)
     when "scramble"
-      mutation_scramble(@gene)
+      scramble_mutation(@gene)
     when "reverse_sequence"  # for TSP
-      mutation_reverse_sequence(@gene)
+      reverse_sequence_mutation(@gene)
     else  # Examine each bit of gene whether it's changed or not.
       @gene.size.times do |i|
         if rand(100) < (mutProbability*100)
@@ -504,7 +504,7 @@ class Individual
   # Invert gene between the two indices.
   # For example, if ary = [0,1,2,3,4,5] and indices are 2 and 4
   # then the inversion result is [0,1,4,3,2,5].
-  def mutation_inversion(gene_ary)
+  def inversion_mutation(gene_ary)
     idx1 = rand(gene_ary.size)
     idx2 = idx1 
     while (idx1 == idx2)
@@ -523,7 +523,7 @@ class Individual
   end
 
 
-  def mutation_translocation(gene_ary)
+  def translocation_mutation(gene_ary)
     idx1 = rand(gene_ary.size)
     idx2 = idx1
     while (idx1 == idx2)
@@ -552,7 +552,7 @@ class Individual
   end
 
 
-  def mutation_move(gene_ary)
+  def move_mutation(gene_ary)
     idx1 = rand(gene_ary.size)
     idx2 = idx1 
     while (idx1 == idx2)
@@ -565,7 +565,7 @@ class Individual
 
 
   # Shuffle gene between the two indices.
-  def mutation_scramble(gene_ary)
+  def scramble_mutation(gene_ary)
     idx1 = rand(gene_ary.size)
     idx2 = idx1 
     while (idx1 == idx2)
@@ -584,7 +584,7 @@ class Individual
 
 
   # [TODO]
-  def mutation_reverse_sequence(gene_ary)
+  def reverse_sequence_mutation(gene_ary)
     return gene_ary
   end
 end
