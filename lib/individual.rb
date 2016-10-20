@@ -399,6 +399,12 @@ class Individual
     reduce_partial_map(h, k, v)
   end
 
+  # Create index ary for 2nd gene.
+  # [TODO]
+  def gen_index_ary(gene1, gene2)
+
+  end 
+  
   # Partially Mapped Crossover (PMX)
   #   gene1,2 : parents' gene
   #   po_num : points for splitting gene
@@ -583,8 +589,73 @@ class Individual
   end
 
 
-  # [TODO]
-  def reverse_sequence_mutation(gene_ary)
+  # TWORS Mutation which is select two elements and exchange them.
+  # For example, [1,2,3,4,5,6] -> [1,4,3,2,5,6] in which 2 and 4 are exchanged
+  def twors_mutation(gene_ary)  # for TSP
+    idx1 = rand(gene_ary.size)
+    idx2 = rand(gene_ary.size)
+    while idx1 == idx2
+      idx2 = rand(gene_ary.size)
+    end
+    tmp = gene_ary[idx1]
+    gene_ary[idx1] = gene_ary[idx2]
+    gene_ary[idx2] = tmp
+
     return gene_ary
+  end
+
+
+  # Center Inverse Mutation (CIM)
+  # Separate gene in two parts, then reverse each of parts.
+  # [1,2,3,4,5,6] -> [1,2,3,4 | 5,6] -> [4,3,2,1 | 6,5]
+  def center_inverse_mutation(gene_ary)
+    tmp_ary = gene_ary.dup
+    pos = rand(gene_ary.size - 1) + 1  # position for separation
+    ary1 = tmp_ary.slice!(0, pos)
+    return ary1.reverse + tmp_ary.reverse
+  end
+
+
+  # Reverse Sequence Mutation (RSM)
+  # Select two points for dividing gene in three parts, reverse middle one
+  # [1,2,3,4,5,6] -> [1 | 2,3,4,5 | 6] -> [1 | 5,4,3,2 | 6]
+  def reverse_sequence_mutation(gene_ary)  # for TSP
+    pos1 = rand(gene_ary.size - 1) + 1
+    pos2 = rand(gene_ary.size - 1) + 1
+    while pos1 == pos2
+      pos2 = rand(gene_ary.size - 1) + 1
+    end
+    if pos1 > pos2
+      tmp = pos1
+      pos1 = pos2
+      pos2 = tmp
+    end
+
+    tmp_ary = gene_ary.dup
+    ary1 = tmp_ary.slice!(0, pos1)
+    ary2 = tmp_ary.slice!(0, pos2 - pos1)
+    return ary1 + ary2.reverse + tmp_ary
+  end
+
+
+  # Throas Mutation
+  # Select three elements of gene. the first is selected randomly and the two
+  # others are those two successors. Then, the last becomes the first of the sequence, the
+  # second becomes last and the first becomes the second in the sequence.  
+  # [1,2,3,4,5,6] -> [1,4,3,2,5,6]
+  # [TODO]
+  def throas_mutation(gene_ary)
+  end
+
+
+  # Thrors Mutation
+  # Three genes are chosen randomly which shall take the different positions not
+  # necessarily successive i < j < l. the gene of the position i becomes in the position j
+  # and the one who was at this position will take the position l and the gene that has
+  # held this position takes the position i. 
+  # [1,2,3,4,5,6] -> [1,6,3,2,5,4]
+  #    ^   ^   ^        ^   ^   ^
+  # [TODO]
+  def thrors_mutation(gene_ary)
   end
 end
