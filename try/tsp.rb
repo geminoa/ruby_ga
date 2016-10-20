@@ -9,8 +9,8 @@ require "fileutils"
 
 # Configuration.
 point_num = 30 
-interval = 20
-num_try = 100 # Number of trial.
+interval = 50
+num_try = 500 # Number of trial.
 
 conf = RubyGAConfig.new(
   unit_num=50,
@@ -19,9 +19,10 @@ conf = RubyGAConfig.new(
   genes=[],
   fitness=nil,
   selection="roulette",
-  mutation="inversion",
-  crossover="uniform",
-  #crossover="stitch",
+  mutation="reverse_sequence",
+  #mutation="center_inverse",
+  #crossover="cycle",
+  crossover="partially_mapped",
   crossoverProbability=0.5,
   mutationProbability=0.3,
   desc="TSP test"
@@ -36,7 +37,7 @@ $cities = [[3, -23],
            [14, -24],
            [24, -10],
            [-19, -8],
-           [4, 9],
+           [4, 9],  # 10
            [10, -12],
            [-2, 14],
            [0, 24],
@@ -46,7 +47,7 @@ $cities = [[3, -23],
            [14, -17],
            [24, -8],
            [5, -17],
-           [-11, 13],
+           [-11, 13],  # 20
            [2, -10],
            [1, -15],
            [-13, -16],
@@ -56,7 +57,7 @@ $cities = [[3, -23],
            [-9, -9],
            [0, 5],
            [6, -11],
-           [15, -3]]
+           [15, -3]]  # 30
 
 # Check each of cities is overlapped
 if $cities.uniq.size != $cities.size
@@ -88,6 +89,8 @@ def sum_distances(gene_ary)
       i += 1
     end
     score = (1.0 / sum) * 1000000
+  else
+    raise "Invalud gene size!: #{gene_ary.uniq.sort}"
   end
 
   #puts "sum: #{sum}, score: #{score}"
@@ -148,7 +151,7 @@ def main(conf, num_try, interval)
     i = num + 1
     po.simple_ga(conf.fitness, conf.selection, conf.mutation)
 
-    puts "average fitness [#{i}]: #{po.average_fitness(fun)}"
+    #puts "average fitness [#{i}]: #{po.average_fitness(fun)}"
 
     #p po.units.size
     if (i == 1) or (i % interval == 0)
@@ -164,7 +167,7 @@ def main(conf, num_try, interval)
         f.write "#{$points[best_unit.gene[0]][0]} #{$points[best_unit.gene[0]][1]}\n"  # 元の位置に戻るように最初の点を追加する
       }
 
-      gnuplot_str += 'plot "points' + i.to_s + '.dat" with linespoints' + "\n"
+      gnuplot_str += 'plot "' + $datdir + '/points' + i.to_s + '.dat" with linespoints' + "\n"
       gnuplot_str += "pause 1\n"
     end
   end

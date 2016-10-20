@@ -163,6 +163,9 @@ class RubyGAConfig
       @gene_var.size.times do |i|
         bits << tmp_gene.slice!(rand(tmp_gene.size))
       end
+      if bits.size != bits.uniq.size
+        raise "Failed to generage_gene for TSP: #{bits}"
+      end
     end
     return bits
   end

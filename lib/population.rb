@@ -45,6 +45,7 @@ class Population
         raise "selection method #{selection} is invalid!"
       end
       child1, child2 = parent1.crossover(parent2, @crossover)
+      #p child1.gene.uniq.size, child2.gene.uniq.size
       #@units << parent1 << parent2 << child1 << child2 
       new_units << child1 << child2
       #2.times do

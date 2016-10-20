@@ -376,7 +376,7 @@ class Individual
       p2_n = gene2[gene1.find_index(p2_n)]
     end
     idx_ary.pop  # remove nouse last index which is same sa first.
-    p idx_ary
+    #p idx_ary
 
     ary =  Array.new(gene1.size)  # ary = [nil, nil, ..., nil]
     idx_ary.each do |idx|
@@ -483,7 +483,7 @@ class Individual
         partial_map[k] = v
       end
     end
-    #p partial_map
+    p partial_map
 
     child1 = []
     child2 = []
@@ -505,6 +505,10 @@ class Individual
         child2[i] = ary1[i - p1]
       end
     end 
+    p child1, child2
+    if (child1.uniq.size != gene1.size) or (child2.uniq.size != gene2.size)
+      raise "Error: Failed to gen children, #{child1.uniq.size}, #{child2.uniq.size}"
+    end
     return child1, child2
   end
 
@@ -650,7 +654,13 @@ class Individual
     tmp_ary = gene_ary.dup
     ary1 = tmp_ary.slice!(0, pos1)
     ary2 = tmp_ary.slice!(0, pos2 - pos1)
-    return ary1 + ary2.reverse + tmp_ary
+    res = ary1 + ary2.reverse + tmp_ary
+
+    if res.uniq.size != gene_ary.size
+      raise "Failed mutation: #{res}"
+    end
+
+    return res
   end
 
 
