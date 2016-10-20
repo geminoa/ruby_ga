@@ -118,8 +118,16 @@ class Individual
       tmp_gene = move_mutation(tmp_gene)
     when "scramble"
       tmp_gene = scramble_mutation(tmp_gene)
+    when "twors"  # for TSP
+      tmp_gene = twors_mutation(tmp_gene)
+    when "center_inverse"  # for TSP
+      tmp_gene = center_inverse_mutation(tmp_gene)
     when "reverse_sequence"  # for TSP
       tmp_gene = reverse_sequence_mutation(tmp_gene)
+    when "throas"  # for TSP
+      tmp_gene = throas_mutation(tmp_gene)
+    when "thrors"  # for TSP
+      tmp_gene = thrors_mutation(tmp_gene)
     else # Examine each bit of gene whether it's changed or not.
       tmp_gene.size.times do |i|
         if rand(100) < (mutProbability*100)
@@ -147,8 +155,16 @@ class Individual
       move_mutation(@gene)
     when "scramble"
       scramble_mutation(@gene)
+    when "twors"  # for TSP
+      twors_mutation(@gene)
+    when "center_inverse"  # for TSP
+      center_inverse_mutation(@gene)
     when "reverse_sequence"  # for TSP
       reverse_sequence_mutation(@gene)
+    when "throas"  # for TSP
+      throas_mutation(@gene)
+    when "thrors"  # for TSP
+      thrors_mutation(@gene)
     else  # Examine each bit of gene whether it's changed or not.
       @gene.size.times do |i|
         if rand(100) < (mutProbability*100)
