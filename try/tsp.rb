@@ -21,8 +21,8 @@ conf = RubyGAConfig.new(
   selection="roulette",
   mutation="reverse_sequence",
   #mutation="center_inverse",
-  #crossover="cycle",
-  crossover="partially_mapped",
+  crossover="cycle",
+  #crossover="partially_mapped",
   crossoverProbability=0.5,
   mutationProbability=0.3,
   desc="TSP test"
@@ -157,6 +157,9 @@ def main(conf, num_try, interval)
     if (i == 1) or (i % interval == 0)
       #puts "avg=#{po.average_fitness(conf.fitness)}, dev=#{po.deviation_fitness(conf.fitness)}"
       #puts "best=#{po.elite_selection(conf.fitness).fitness(conf.fitness)}"
+      file = "#{$datdir}/points#{i}.dat"
+
+      ###
       open("#{$datdir}/points#{i}.dat", "w+"){|f|
         best_unit = po.elite_selection(conf.fitness)
         #p best_unit.gene
@@ -164,8 +167,10 @@ def main(conf, num_try, interval)
           point = $points[best_unit.gene[idx]]
           f.write "#{point[0]} #{point[1]}\n"
         end
-        f.write "#{$points[best_unit.gene[0]][0]} #{$points[best_unit.gene[0]][1]}\n"  # 元の位置に戻るように最初の点を追加する
+        # 元の位置に戻るように最初の点を追加する
+        f.write "#{$points[best_unit.gene[0]][0]} #{$points[best_unit.gene[0]][1]}\n"
       }
+      ###
 
       gnuplot_str += 'plot "' + $datdir + '/points' + i.to_s + '.dat" with linespoints' + "\n"
       gnuplot_str += "pause 1\n"
@@ -173,5 +178,20 @@ def main(conf, num_try, interval)
   end
   open("#{$datdir}/plot.gpl", "w+"){|f| f.write(gnuplot_str)}
 end
+
+
+def plot_dat(file, unit)
+  open("#{$datdir}/points#{i}.dat", "w+"){|f|
+    best_unit = po.elite_selection(conf.fitness)
+    #p best_unit.gene
+    best_unit.gene.each do |idx|
+      point = $points[best_unit.gene[idx]]
+      f.write "#{point[0]} #{point[1]}\n"
+    end
+    # 元の位置に戻るように最初の点を追加する
+    f.write "#{$points[best_unit.gene[0]][0]} #{$points[best_unit.gene[0]][1]}\n"
+  }
+end
+
 
 main(conf, num_try, interval)

@@ -393,6 +393,10 @@ class Individual
         ch2[i] = gene1[i]
       end
     end
+
+    if (ch1.uniq.size != gene1.size) or (ch2.uniq.size != gene2.size)
+      raise "Error: Failed to gen children, #{child1.uniq.size}, #{child2.uniq.size}"
+    end
     return ch1, ch2
   end
 
@@ -415,11 +419,6 @@ class Individual
     reduce_partial_map(h, k, v)
   end
 
-  # Create index ary for 2nd gene.
-  # [TODO]
-  def gen_index_ary(gene1, gene2)
-
-  end 
   
   # Partially Mapped Crossover (PMX)
   #   gene1,2 : parents' gene
@@ -483,7 +482,7 @@ class Individual
         partial_map[k] = v
       end
     end
-    p partial_map
+    #p partial_map
 
     child1 = []
     child2 = []
@@ -505,8 +504,9 @@ class Individual
         child2[i] = ary1[i - p1]
       end
     end 
-    p child1, child2
     if (child1.uniq.size != gene1.size) or (child2.uniq.size != gene2.size)
+      #p gene1.uniq.size, gene2.uniq.size
+      #p child1, child2
       raise "Error: Failed to gen children, #{child1.uniq.size}, #{child2.uniq.size}"
     end
     return child1, child2
